@@ -3,6 +3,23 @@
 Todas las novedades relevantes de este proyecto se documentan aquí.
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/).
 
+## [1.1.0] — 2026-06-17
+
+Conversiones de documentos, manteniendo la base mínima.
+
+### Añadido
+- **PDF → imágenes** (PNG/JPG a 150/300 ppp, con `pdftoppm`).
+- **Imágenes → PDF** sin pérdida (`img2pdf`), una o varias.
+- **Office → PDF** (docx/odt/xlsx/pptx/rtf…) con LibreOffice headless y perfil aislado.
+- **PDF → texto** (`pdftotext`) y **comprimir PDF** (`ghostscript`, avisa si no reduce).
+- **OCR** para PDF escaneados (`ocrmypdf`, idioma español por defecto).
+- `optdepends` para que la instalación base siga siendo mínima (poppler + kdialog);
+  cada función avisa con el comando exacto si le falta su herramienta opcional.
+
+### Cambiado
+- El service menu de PDF único pasa a `conversor-dolphin-pdf.desktop` y agrupa
+  dividir + convertir. Nuevos menús para imágenes y para documentos de oficina.
+
 ## [1.0.0] — 2026-06-17
 
 Primera versión empaquetada y lista para AUR.

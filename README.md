@@ -1,29 +1,37 @@
 # conversor-dolphin
 
-Menú contextual de **Dolphin** (KDE Plasma 6 / KF6) para **unir** y **dividir**
-archivos PDF, usando poppler (`pdfunite`, `pdfseparate`, `pdfinfo`) y `kdialog`.
-Sin dependencias pesadas: son dos scripts de shell y dos *service menus*.
+Menú contextual de **Dolphin** (KDE Plasma 6 / KF6) para **unir**, **dividir** y
+**convertir** archivos PDF, imágenes y documentos de oficina. Scripts de shell
+ligeros sobre poppler, ghostscript, img2pdf, LibreOffice y ocrmypdf, con `kdialog`.
 
 ## Acciones
 
-Al hacer clic derecho sobre archivos `application/pdf` aparece el submenú
-**«Acciones PDF» / «PDF Actions»** (menús bilingües ES/EN):
+Submenú **«Acciones PDF» / «PDF Actions»** (bilingüe ES/EN) al hacer clic derecho,
+según lo que selecciones:
 
-| Acción | Cuándo aparece | Resultado |
-|--------|----------------|-----------|
-| **Unir los PDF seleccionados…** | con ≥ 2 PDF | Diálogo para reordenar y fusiona. Nombre: 2 archivos → `a_b.pdf`; 3 o más → `a_y_otros.pdf`. Si existe, añade `-2`. |
-| **Dividir: cada página en un archivo** | con 1 PDF | `original-1.pdf`, `original-2.pdf`, … |
-| **Dividir: extraer un rango…** | con 1 PDF | Pide `3-7` (o un número) y genera solo ese rango: `original-3_a_7.pdf`. |
-| **Dividir: en bloques de N páginas…** | con 1 PDF | Pide N y parte en trozos de N páginas. |
+**Sobre un PDF:**
+- **Dividir**: cada página · extraer un rango (`3-7`) · en bloques de N páginas.
+- **Convertir a imágenes** (PNG/JPG, 150/300 ppp) · **a texto** plano.
+- **Comprimir** (reduce el tamaño con ghostscript).
+- **OCR**: añade una capa de texto buscable (ocrmypdf).
 
-Los resultados de **dividir** van a una subcarpeta `original-dividido/` junto al
-original. Al terminar se muestra un aviso pasivo (no intrusivo) con el resultado;
-si algo falla, un diálogo de error y se limpia lo dejado a medias.
+**Sobre 2 o más PDF:** **Unir** (con diálogo para reordenar; 2 → `a_b.pdf`, 3+ → `a_y_otros.pdf`).
+
+**Sobre imágenes** (PNG/JPG/WebP/TIFF/BMP): **Unir en un PDF** sin pérdida (img2pdf).
+
+**Sobre documentos de oficina** (docx, odt, xlsx, pptx, rtf…): **Convertir a PDF** (LibreOffice).
+
+Convenciones: las divisiones y las imágenes van a una subcarpeta junto al original;
+el resto se deja al lado sin sobrescribir (añade `-2`, `-3`…). Aviso pasivo al terminar;
+diálogo de error (y limpieza de lo dejado a medias) si algo falla.
 
 ## Dependencias
 
-`poppler` y `kdialog`, ambos en los repos oficiales de Arch. (Lo demás —`bash`,
-`coreutils`, `gawk`, `grep`— forma parte del sistema base.)
+**Obligatorias:** `poppler` y `kdialog`.
+
+**Opcionales** (cada función avisa con el comando exacto si le falta su herramienta):
+`ghostscript` (comprimir), `img2pdf` (imágenes→PDF), `libreoffice-still` (oficina→PDF),
+`ocrmypdf` + `tesseract-data-spa` (OCR). Todas en los repos oficiales de Arch.
 
 ## Instalación
 
