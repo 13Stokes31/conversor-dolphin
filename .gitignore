@@ -1,0 +1,5 @@
+# Artefactos de makepkg
+/pkg/
+/src/
+*.pkg.tar.*
+*.log

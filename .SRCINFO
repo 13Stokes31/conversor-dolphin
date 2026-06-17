@@ -1,0 +1,24 @@
+pkgbase = conversor-dolphin
+	pkgdesc = Dolphin (KF6) service menu to merge and split PDF files — poppler + kdialog
+	pkgver = 1.0.0
+	pkgrel = 1
+	url = https://github.com/Stokes/conversor-dolphin
+	install = conversor-dolphin.install
+	arch = any
+	license = MIT
+	depends = poppler
+	depends = kdialog
+	source = pdf-unir.sh
+	source = pdf-dividir.sh
+	source = conversor-dolphin-unir.desktop
+	source = conversor-dolphin-dividir.desktop
+	source = Makefile
+	source = LICENSE
+	sha256sums = 99769f3853c4505662a0250b6866736d24c0af7f6b814a5bc4ba8b784a552e72
+	sha256sums = 27ba15d61802747f43c40eb576c6e3e892a9d5d9cf257af0947f7c0ed5a73765
+	sha256sums = 220c378200e1d9a5d7461a7acde059585979950537f9db3c142cec4f635bcaf1
+	sha256sums = 486d2abbc25e4dc8a85eaff0dd6c81b368790a7feccfc7eedd1ff25604c75ca7
+	sha256sums = 57573ce9e24fecf99cf56bc82871744bcb27bc1fc3e084e8eecd15e0dc810e58
+	sha256sums = b6b66ed3de09e5429cd6c6e7ebb2ad74f77ea2e9e15009063b0741668d2b45f8
+
+pkgname = conversor-dolphin
