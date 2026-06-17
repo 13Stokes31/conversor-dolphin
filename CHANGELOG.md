@@ -3,6 +3,24 @@
 Todas las novedades relevantes de este proyecto se documentan aquí.
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/).
 
+## [1.2.0] — 2026-06-17
+
+Conversores de imagen, audio y vídeo: conversor-dolphin pasa de «manejo de PDF» a
+conversor general de archivos.
+
+### Añadido
+- **Imagen** (`img-convertir.sh`, ImageMagick): JPG ↔ PNG ↔ WebP ↔ AVIF ↔ TIFF, y
+  lectura de **HEIC/HEIF** (fotos de móvil). Submenú «Convertir imagen» (con «a PDF»).
+- **Audio** (`audio-convertir.sh`, ffmpeg): MP3 / FLAC / WAV / OGG / Opus / M4A.
+- **Vídeo** (`video-convertir.sh`, ffmpeg): a MP4 (H.264), WebM (VP9), GIF animado,
+  extraer audio (MP3) y comprimir.
+- `optdepends` nuevas: `imagemagick` y `ffmpeg`.
+
+### Cambiado
+- Menús reorganizados en submenús por tipo: «Acciones PDF», «Convertir imagen»,
+  «Convertir audio», «Convertir vídeo», «Convertir documento».
+- Cada acción de menú es un formato destino (un clic, sin diálogo).
+
 ## [1.1.0] — 2026-06-17
 
 Conversiones de documentos, manteniendo la base mínima.

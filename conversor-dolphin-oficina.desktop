@@ -2,11 +2,11 @@
 Type=Service
 MimeType=application/vnd.openxmlformats-officedocument.wordprocessingml.document;application/msword;application/vnd.oasis.opendocument.text;application/rtf;application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;application/vnd.ms-excel;application/vnd.oasis.opendocument.spreadsheet;application/vnd.openxmlformats-officedocument.presentationml.presentation;application/vnd.ms-powerpoint;application/vnd.oasis.opendocument.presentation;
 Actions=officeToPdf
-X-KDE-Submenu=PDF Actions
-X-KDE-Submenu[es]=Acciones PDF
+X-KDE-Submenu=Convert document
+X-KDE-Submenu[es]=Convertir documento
 
 [Desktop Action officeToPdf]
-Name=Convert to PDF
-Name[es]=Convertir a PDF
+Name=to PDF
+Name[es]=a PDF
 Icon=application-pdf
 Exec=/usr/share/conversor-dolphin/office-a-pdf.sh %F

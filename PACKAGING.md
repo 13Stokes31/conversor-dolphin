@@ -35,7 +35,7 @@ makepkg -si                # construye e instala con pacman
    git clone ssh://aur@aur.archlinux.org/conversor-dolphin.git aur-conversor
    cd aur-conversor
    cp ../conversor-dolphin/{PKGBUILD,.SRCINFO,conversor-dolphin.install,Makefile,LICENSE} .
-   cp ../conversor-dolphin/{pdf-unir.sh,pdf-dividir.sh} .
+   cp ../conversor-dolphin/*.sh .
    cp ../conversor-dolphin/conversor-dolphin-*.desktop .
    git add -A
    git commit -m "Initial import: conversor-dolphin 1.0.0-1"
