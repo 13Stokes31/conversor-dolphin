@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Service
 MimeType=video/mp4;video/x-matroska;video/webm;video/quicktime;video/x-msvideo;video/x-flv;video/mpeg;video/x-ms-wmv;video/3gpp;
-Actions=vidMp4;vidWebm;vidGif;vidAudio;vidComprimir
+Actions=vidMp4;vidMp41080;vidMp4720;vidWebm;vidGif;vidAudio;vidComprimir
 X-KDE-Submenu=Convert video
 X-KDE-Submenu[es]=Convertir vídeo
 
@@ -10,6 +10,18 @@ Name=to MP4 (H.264)
 Name[es]=a MP4 (H.264)
 Icon=video-x-generic
 Exec=/usr/share/conversor-dolphin/video-convertir.sh mp4 %F
+
+[Desktop Action vidMp41080]
+Name=to MP4 1080p
+Name[es]=a MP4 1080p
+Icon=video-x-generic
+Exec=/usr/share/conversor-dolphin/video-convertir.sh mp4-1080 %F
+
+[Desktop Action vidMp4720]
+Name=to MP4 720p
+Name[es]=a MP4 720p
+Icon=video-x-generic
+Exec=/usr/share/conversor-dolphin/video-convertir.sh mp4-720 %F
 
 [Desktop Action vidWebm]
 Name=to WebM (VP9)

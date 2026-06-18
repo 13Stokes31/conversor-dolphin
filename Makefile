@@ -17,10 +17,12 @@ MENUDIR    := $(SHAREDIR)/kio/servicemenus
 LICENSEDIR := $(SHAREDIR)/licenses/$(NAME)
 
 SCRIPTS := pdf-unir.sh pdf-dividir.sh pdf-convertir.sh img-a-pdf.sh office-a-pdf.sh \
-           img-convertir.sh audio-convertir.sh video-convertir.sh
+           img-convertir.sh audio-convertir.sh video-convertir.sh svg-convertir.sh \
+           ebook-a-pdf.sh
 MENUS   := conversor-dolphin-pdf.desktop conversor-dolphin-unir.desktop \
            conversor-dolphin-imagenes.desktop conversor-dolphin-oficina.desktop \
-           conversor-dolphin-audio.desktop conversor-dolphin-video.desktop
+           conversor-dolphin-audio.desktop conversor-dolphin-video.desktop \
+           conversor-dolphin-svg.desktop conversor-dolphin-ebook.desktop
 
 .PHONY: install uninstall
 

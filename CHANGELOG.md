@@ -3,6 +3,20 @@
 Todas las novedades relevantes de este proyecto se documentan aquí.
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/).
 
+## [1.3.0] — 2026-06-18
+
+Más formatos: SVG, perfiles de vídeo y libros electrónicos. Cada uno con su propio
+submenú filtrado por tipo de archivo (no aparece donde no toca).
+
+### Añadido
+- **SVG** (`svg-convertir.sh`, librsvg): submenú «Convertir SVG» con «a PNG»
+  (rasterizado) y «a PDF» (vectorial). Solo aparece sobre archivos `.svg`.
+- **Vídeo** (`video-convertir.sh`): perfiles «a MP4 1080p» y «a MP4 720p» que
+  reescalan sin agrandar (`scale=-2:'min(N,ih)'`).
+- **Libros electrónicos** (`ebook-a-pdf.sh`, Calibre): submenú «Convertir libro»
+  con «a PDF», para EPUB / MOBI / AZW / AZW3 / FB2.
+- `optdepends` nuevas: `librsvg` (SVG) y `calibre` (libros).
+
 ## [1.2.0] — 2026-06-17
 
 Conversores de imagen, audio y vídeo: conversor-dolphin pasa de «manejo de PDF» a

@@ -17,11 +17,18 @@ Distintos submenús de clic derecho según el tipo de archivo (menús bilingües
 Sobre imágenes (JPG/PNG/WebP/AVIF/TIFF/BMP/GIF/**HEIC**): a PDF (une varias sin pérdida)
 o a otro formato (JPG/PNG/WebP/AVIF/TIFF).
 
+### «Convertir SVG»
+Sobre archivos `.svg`: a PNG (rasterizado) o a PDF (vectorial, sin pérdida).
+
 ### «Convertir audio»
 Sobre audio: a MP3 / FLAC / WAV / OGG / Opus / M4A.
 
 ### «Convertir vídeo»
-Sobre vídeo: a MP4 (H.264) · WebM (VP9) · GIF animado · extraer audio (MP3) · comprimir.
+Sobre vídeo: a MP4 (H.264) · a MP4 1080p · a MP4 720p (reescalan sin agrandar) ·
+WebM (VP9) · GIF animado · extraer audio (MP3) · comprimir.
+
+### «Convertir libro»
+Sobre libros electrónicos (EPUB, MOBI, AZW, AZW3, FB2): a PDF (Calibre).
 
 ### «Convertir documento»
 Sobre documentos de oficina (docx, odt, xlsx, pptx, rtf…): a PDF (LibreOffice).
@@ -36,7 +43,8 @@ terminar; diálogo de error (y limpieza de lo dejado a medias) si algo falla.
 
 **Opcionales** (cada función avisa con el comando exacto si le falta su herramienta):
 `ghostscript` (comprimir PDF), `img2pdf` (imágenes→PDF), `imagemagick` (convertir imágenes),
-`ffmpeg` (audio y vídeo), `libreoffice-still` (oficina→PDF), `ocrmypdf` + `tesseract-data-spa`
+`ffmpeg` (audio y vídeo), `librsvg` (SVG→PNG/PDF), `calibre` (libros→PDF),
+`libreoffice-still` (oficina→PDF), `ocrmypdf` + `tesseract-data-spa`
 (OCR). Todas en los repos oficiales de Arch.
 
 ## Instalación
