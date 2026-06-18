@@ -97,7 +97,8 @@ case "$modo" in
         ;;
 
     ocr)
-        need ocrmypdf ocrmypdf
+        command -v ocrmypdf >/dev/null \
+            || err "Falta «ocrmypdf» (está en AUR, no en los repos oficiales).\n\nInstálalo con:\n    yay -S ocrmypdf"
         # Idioma por defecto: español (tesseract-data-spa). Para otros idiomas,
         # instala tesseract-data-<idioma> y cambia «-l spa» abajo (p. ej. spa+eng).
         out=$(salida_libre "$dir/$stem-ocr" pdf)

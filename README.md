@@ -45,7 +45,8 @@ terminar; diálogo de error (y limpieza de lo dejado a medias) si algo falla.
 `ghostscript` (comprimir PDF), `img2pdf` (imágenes→PDF), `imagemagick` (convertir imágenes),
 `ffmpeg` (audio y vídeo), `librsvg` (SVG→PNG/PDF), `calibre` (libros→PDF),
 `libreoffice-still` (oficina→PDF), `ocrmypdf` + `tesseract-data-spa`
-(OCR). Todas en los repos oficiales de Arch.
+(OCR). Casi todas en los repos oficiales de Arch; **`ocrmypdf` está en AUR**
+(`yay -S ocrmypdf`).
 
 ## Instalación
 

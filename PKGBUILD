@@ -15,7 +15,7 @@ optdepends=('ghostscript: comprimir PDF'
             'librsvg: convertir SVG a PNG/PDF'
             'calibre: convertir libros electrónicos (EPUB/MOBI/AZW…) a PDF'
             'libreoffice-still: convertir documentos de oficina a PDF (o libreoffice-fresh)'
-            'ocrmypdf: OCR, añadir capa de texto buscable a un PDF'
+            'ocrmypdf: OCR, añadir capa de texto buscable a un PDF (AUR)'
             'tesseract-data-spa: datos de OCR en español')
 install="$pkgname.install"
 source=("pdf-unir.sh"
@@ -40,7 +40,7 @@ source=("pdf-unir.sh"
         "LICENSE")
 sha256sums=('99769f3853c4505662a0250b6866736d24c0af7f6b814a5bc4ba8b784a552e72'
             '27ba15d61802747f43c40eb576c6e3e892a9d5d9cf257af0947f7c0ed5a73765'
-            'ced51ccb8edf7251c28596475b409c4f250156e9dd73460faab38b743e02a38a'
+            '88b7d872c73ab9f5cc4e27fb33a469c8cbbd964fb2980bd8427040ca61157b28'
             '7ea4acf2a2961db3334e31aa17639b3fb21239242a6b0cc023cc4e301a150377'
             '79539e8645adcf66f196189906775e7a112ca3b2682270011dd2c7d74aedb759'
             'd4fdbbed1fea26b416570e3e1fed26559ef5304930cc3a98b3e808b01ea67953'
