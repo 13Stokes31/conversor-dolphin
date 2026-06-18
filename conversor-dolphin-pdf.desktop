@@ -1,5 +1,6 @@
 [Desktop Entry]
 Type=Service
+X-KDE-Priority=TopLevel
 MimeType=application/pdf;
 X-KDE-MaxNumberOfUrls=1
 Actions=pdfDivPaginas;pdfDivRango;pdfDivBloques;pdfImagenes;pdfTexto;pdfComprimir;pdfOcr

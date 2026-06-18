@@ -1,5 +1,6 @@
 [Desktop Entry]
 Type=Service
+X-KDE-Priority=TopLevel
 MimeType=image/jpeg;image/png;image/webp;image/tiff;image/bmp;image/gif;image/heif;image/heic;image/avif;
 Actions=imgToPdf;imgToJpg;imgToPng;imgToWebp;imgToAvif;imgToTiff
 X-KDE-Submenu=Convert image

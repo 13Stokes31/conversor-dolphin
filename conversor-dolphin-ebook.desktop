@@ -1,5 +1,6 @@
 [Desktop Entry]
 Type=Service
+X-KDE-Priority=TopLevel
 MimeType=application/epub+zip;application/x-mobipocket-ebook;application/vnd.amazon.ebook;application/x-mobi8-ebook;application/x-fictionbook+xml;
 Actions=ebookToPdf
 X-KDE-Submenu=Convert e-book

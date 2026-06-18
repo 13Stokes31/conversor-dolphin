@@ -1,5 +1,6 @@
 [Desktop Entry]
 Type=Service
+X-KDE-Priority=TopLevel
 MimeType=video/mp4;video/x-matroska;video/webm;video/quicktime;video/x-msvideo;video/x-flv;video/mpeg;video/x-ms-wmv;video/3gpp;
 Actions=vidMp4;vidMp41080;vidMp4720;vidWebm;vidGif;vidAudio;vidComprimir
 X-KDE-Submenu=Convert video

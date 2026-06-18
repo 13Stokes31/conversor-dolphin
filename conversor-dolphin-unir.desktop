@@ -1,5 +1,6 @@
 [Desktop Entry]
 Type=Service
+X-KDE-Priority=TopLevel
 MimeType=application/pdf;
 X-KDE-MinNumberOfUrls=2
 Actions=pdfUnir

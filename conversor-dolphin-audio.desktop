@@ -1,5 +1,6 @@
 [Desktop Entry]
 Type=Service
+X-KDE-Priority=TopLevel
 MimeType=audio/mpeg;audio/flac;audio/x-flac;audio/wav;audio/x-wav;audio/ogg;audio/x-vorbis+ogg;audio/opus;audio/x-opus+ogg;audio/mp4;audio/x-m4a;audio/aac;
 Actions=audMp3;audFlac;audWav;audOgg;audOpus;audM4a
 X-KDE-Submenu=Convert audio
