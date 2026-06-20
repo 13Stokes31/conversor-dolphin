@@ -48,6 +48,9 @@ terminar; diálogo de error (y limpieza de lo dejado a medias) si algo falla.
 (OCR). Casi todas en los repos oficiales de Arch; **`ocrmypdf` está en AUR**
 (`yay -S ocrmypdf`).
 
+> Para **HEIC/HEIF** (fotos de móvil) y para **escribir AVIF**, ImageMagick necesita
+> además el delegado `libheif` (`sudo pacman -S libheif`).
+
 ## Instalación
 
 ### Desde AUR  *(recomendado en Arch / EndeavourOS)*

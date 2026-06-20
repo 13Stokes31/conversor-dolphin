@@ -3,6 +3,29 @@
 Todas las novedades relevantes de este proyecto se documentan aquí.
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/).
 
+## [1.3.1] — 2026-06-21
+
+Correcciones y mejoras de calidad, sin cambios de uso.
+
+### Corregido
+- **Office → PDF:** dos documentos con el mismo nombre base (p. ej. `informe.docx`
+  e `informe.odt`, o el mismo nombre en carpetas distintas) colisionaban en el
+  directorio temporal y solo se generaba uno. Ahora se convierte de uno en uno.
+- **Imagen → otro formato:** una entrada con varios fotogramas/páginas (GIF
+  animado, TIFF multipágina) generaba múltiples ficheros sueltos y se saltaba el
+  control de sobrescritura. Ahora se toma solo el primer fotograma (`[0]`).
+
+### Mejorado
+- **Vídeo → GIF:** paleta optimizada en dos pasadas (`palettegen`/`paletteuse`),
+  bastante mejor calidad sin bandeado.
+- **PDF → imágenes:** el aviso final cuenta las imágenes realmente generadas.
+- Todos los conversores blindan nombres que empiezan por «-» (no se confunden
+  con opciones de la herramienta).
+
+### Añadido
+- `optdepends` `libheif` (HEIC/HEIF de entrada y escritura de AVIF en ImageMagick),
+  documentado también en el README.
+
 ## [1.3.0] — 2026-06-18
 
 Más formatos: SVG, perfiles de vídeo y libros electrónicos. Cada uno con su propio

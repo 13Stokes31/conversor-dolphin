@@ -7,7 +7,7 @@
 #   mp4-1080   -> H.264 reescalado a 1080p (no agranda si ya es menor)
 #   mp4-720    -> H.264 reescalado a 720p (no agranda si ya es menor)
 #   webm       -> VP9 + Opus (web)
-#   gif        -> GIF animado (12 fps, ancho 480 px)
+#   gif        -> GIF animado (12 fps, ancho 480 px, paleta optimizada)
 #   audio      -> extrae la pista de audio a MP3
 #   comprimir  -> MP4 más pequeño (H.264 CRF 28)
 # Resultado junto al original, sin sobrescribir. Los vídeos pueden tardar.
@@ -29,7 +29,7 @@ case "$modo" in
     mp4-1080)  ext=mp4;  sufijo="-1080p"; opts=(-vf "scale=-2:'min(1080,ih)'" -c:v libx264 -crf 23 -preset medium -c:a aac -b:a 192k -movflags +faststart) ;;
     mp4-720)   ext=mp4;  sufijo="-720p";  opts=(-vf "scale=-2:'min(720,ih)'"  -c:v libx264 -crf 23 -preset medium -c:a aac -b:a 160k -movflags +faststart) ;;
     webm)      ext=webm; opts=(-c:v libvpx-vp9 -crf 32 -b:v 0 -c:a libopus) ;;
-    gif)       ext=gif;  opts=(-vf "fps=12,scale=480:-1:flags=lanczos") ;;
+    gif)       ext=gif;  opts=(-vf "fps=12,scale=480:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse") ;;
     audio)     ext=mp3;  opts=(-vn -codec:a libmp3lame -q:a 2) ;;
     comprimir) ext=mp4;  sufijo="-comprimido"; opts=(-c:v libx264 -crf 28 -preset medium -c:a aac -b:a 128k -movflags +faststart) ;;
     *) err "Modo de vídeo desconocido: $modo" ;;

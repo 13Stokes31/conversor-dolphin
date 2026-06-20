@@ -24,6 +24,7 @@ ok "Convirtiendo a PDF… los libros grandes pueden tardar."
 hechos=0
 for f in "$@"; do
     [[ -f "$f" ]] || continue
+    [[ "$f" == -* ]] && f="./$f"        # no confundir un nombre «-algo» con una opción
     d=$(dirname -- "$f"); s=$(basename -- "$f"); s="${s%.*}"
     out="$d/$s.pdf"; n=2
     while [[ -e "$out" ]]; do out="$d/$s-$n.pdf"; n=$((n + 1)); done

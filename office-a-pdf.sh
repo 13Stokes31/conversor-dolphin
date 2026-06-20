@@ -27,19 +27,24 @@ tmpout=$(mktemp -d)
 profile=$(mktemp -d)
 trap 'rm -rf "$tmpout" "$profile"' EXIT
 
-# Conversión (en bloque) a un directorio temporal: LibreOffice crea <nombre>.pdf.
-if ! "$soffice_bin" --headless --norestore \
-        -env:UserInstallation="file://$profile" \
-        --convert-to pdf --outdir "$tmpout" "$@" >/dev/null 2>"$tmpout/.log"; then
-    err "LibreOffice no pudo convertir:\n$(tail -3 "$tmpout/.log" 2>/dev/null || echo 'error desconocido')"
-fi
-
-# Mueve cada PDF generado junto a su original, sin colisiones.
+# LibreOffice nombra la salida por el nombre base del original (sin extensión),
+# así que dos documentos con el mismo nombre (p. ej. «informe.docx» e
+# «informe.odt», o el mismo nombre en dos carpetas) colisionarían en un único
+# directorio de salida. Por eso convertimos de uno en uno y movemos cada PDF
+# antes de procesar el siguiente.
 hechos=0
 for f in "$@"; do
+    [[ -f "$f" ]] || continue
+    [[ "$f" == -* ]] && f="./$f"        # no confundir un nombre «-algo» con una opción
     d=$(dirname -- "$f")
     s=$(basename -- "$f"); s="${s%.*}"
-    [[ -f "$tmpout/$s.pdf" ]] || continue
+    rm -f "$tmpout/$s.pdf"
+    if ! "$soffice_bin" --headless --norestore \
+            -env:UserInstallation="file://$profile" \
+            --convert-to pdf --outdir "$tmpout" "$f" >/dev/null 2>"$tmpout/.log" \
+            || [[ ! -f "$tmpout/$s.pdf" ]]; then
+        err "LibreOffice no pudo convertir «$(basename -- "$f")»:\n$(tail -3 "$tmpout/.log" 2>/dev/null || echo 'error desconocido')"
+    fi
     out="$d/$s.pdf"; n=2
     while [[ -e "$out" ]]; do out="$d/$s-$n.pdf"; n=$((n + 1)); done
     mv -- "$tmpout/$s.pdf" "$out"

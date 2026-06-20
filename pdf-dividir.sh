@@ -26,6 +26,7 @@ modo="$1"
 file="$2"
 
 [[ -f "$file" ]] || err "El archivo no existe:\n$file"
+[[ "$file" == -* ]] && file="./$file"   # no confundir un nombre «-algo» con una opción
 
 dir=$(dirname -- "$file")
 stem=$(basename -- "$file" .pdf)

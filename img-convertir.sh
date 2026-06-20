@@ -5,7 +5,8 @@
 # Uso: img-convertir.sh <formato> imagen1 [imagen2 ...]
 #   formato: jpg | png | webp | avif | tiff
 # Convierte cada imagen seleccionada y deja el resultado junto al original sin
-# sobrescribir (añade -2, -3…). Admite HEIC/HEIF de entrada (fotos de móvil).
+# sobrescribir (añade -2, -3…). Admite HEIC/HEIF de entrada (fotos de móvil;
+# requiere el delegado libheif en ImageMagick).
 
 set -euo pipefail
 
@@ -32,10 +33,13 @@ trap 'rm -f "$errf"' EXIT
 hechos=0
 for f in "$@"; do
     [[ -f "$f" ]] || continue
+    [[ "$f" == -* ]] && f="./$f"        # no confundir un nombre «-algo» con una opción
     d=$(dirname -- "$f"); s=$(basename -- "$f"); s="${s%.*}"
     out="$d/$s.$ext"; n=2
     while [[ -e "$out" ]]; do out="$d/$s-$n.$ext"; n=$((n + 1)); done
-    if ! "$IM" "$f" "${opts[@]}" "$out" 2>"$errf"; then
+    # «[0]»: si la entrada tiene varios fotogramas/páginas (GIF animado, TIFF
+    # multipágina) toma solo el primero, para no generar salida-0, salida-1…
+    if ! "$IM" "${f}[0]" "${opts[@]}" "$out" 2>"$errf"; then
         rm -f "$out"
         err "No se pudo convertir «$(basename -- "$f")»:\n$(tail -2 "$errf" 2>/dev/null || echo 'error desconocido')"
     fi

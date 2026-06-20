@@ -29,6 +29,7 @@ trap 'rm -f "$errf"' EXIT
 hechos=0
 for f in "$@"; do
     [[ -f "$f" ]] || continue
+    [[ "$f" == -* ]] && f="./$f"        # no confundir un nombre «-algo» con una opción
     d=$(dirname -- "$f"); s=$(basename -- "$f"); s="${s%.*}"
     out="$d/$s.$ext"; n=2
     while [[ -e "$out" ]]; do out="$d/$s-$n.$ext"; n=$((n + 1)); done

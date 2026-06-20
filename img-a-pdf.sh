@@ -21,6 +21,9 @@ command -v img2pdf >/dev/null \
 # Orden natural por ruta.
 mapfile -t imgs < <(printf '%s\n' "$@" | sort -V)
 
+# No confundir un nombre «-algo» con una opción de img2pdf.
+for i in "${!imgs[@]}"; do [[ "${imgs[i]}" == -* ]] && imgs[i]="./${imgs[i]}"; done
+
 dir=$(dirname -- "${imgs[0]}")
 stem=$(basename -- "${imgs[0]}"); stem="${stem%.*}"
 if (( ${#imgs[@]} == 1 )); then base="$stem"; else base="${stem}_y_otras"; fi

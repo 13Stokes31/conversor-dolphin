@@ -24,6 +24,7 @@ trap 'rm -f "$errf"' EXIT
 modo="$1"
 file="$2"
 [[ -f "$file" ]] || err "El archivo no existe:\n$file"
+[[ "$file" == -* ]] && file="./$file"   # no confundir un nombre «-algo» con una opción
 
 dir=$(dirname -- "$file")
 stem=$(basename -- "$file" .pdf)
@@ -58,7 +59,8 @@ case "$modo" in
             rm -rf "$outdir"
             err "No se pudo convertir a imágenes:\n$(cat "$errf" 2>/dev/null || echo 'error desconocido')"
         fi
-        ok "$total imágenes ($fmt) creadas en:\n$(basename -- "$outdir")/"
+        num=$(find "$outdir" -maxdepth 1 -type f -name "*.$fmt" | wc -l)
+        ok "$num imágenes ($fmt) creadas en:\n$(basename -- "$outdir")/"
         ;;
 
     texto)

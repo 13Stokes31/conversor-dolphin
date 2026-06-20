@@ -1,7 +1,7 @@
 # Maintainer: Stokes <jesusmanuelgonzalezmeneses18@gmail.com>
 
 pkgname=conversor-dolphin
-pkgver=1.3.0
+pkgver=1.3.1
 pkgrel=1
 pkgdesc="Dolphin (KF6) service menu to manage PDF and convert PDF, images, SVG, audio, video, e-books and office files"
 arch=('any')
@@ -11,6 +11,7 @@ depends=('poppler' 'kdialog')
 optdepends=('ghostscript: comprimir PDF'
             'img2pdf: convertir imágenes a PDF (sin pérdida)'
             'imagemagick: convertir entre formatos de imagen (JPG/PNG/WebP/AVIF/TIFF, HEIC…)'
+            'libheif: leer HEIC/HEIF y escribir AVIF en imagemagick'
             'ffmpeg: convertir audio y vídeo'
             'librsvg: convertir SVG a PNG/PDF'
             'calibre: convertir libros electrónicos (EPUB/MOBI/AZW…) a PDF'
@@ -38,16 +39,16 @@ source=("pdf-unir.sh"
         "conversor-dolphin-ebook.desktop"
         "Makefile"
         "LICENSE")
-sha256sums=('99769f3853c4505662a0250b6866736d24c0af7f6b814a5bc4ba8b784a552e72'
-            '27ba15d61802747f43c40eb576c6e3e892a9d5d9cf257af0947f7c0ed5a73765'
-            '88b7d872c73ab9f5cc4e27fb33a469c8cbbd964fb2980bd8427040ca61157b28'
-            '7ea4acf2a2961db3334e31aa17639b3fb21239242a6b0cc023cc4e301a150377'
-            '79539e8645adcf66f196189906775e7a112ca3b2682270011dd2c7d74aedb759'
-            'd4fdbbed1fea26b416570e3e1fed26559ef5304930cc3a98b3e808b01ea67953'
+sha256sums=('72b6d7c9f928559a8afc322cc98a2958b83b53f262381e77badf2c279b1c39ce'
+            '9ea9e66351b1abe7f9d694cb81f285e575ce2f75297c652311790fa64b79acdb'
+            'cd57636ee67c12e37ba5016337e3b689384a0012998466e5b4aff460a34f0e75'
+            '3f7d2e5034ffebaceac5242095c4369fa0ec4c00c4bb64053990ab01b65a5cdd'
+            '363b0996123e488ebb636f7059302bcbfb96f208912f5487e733cdc276fc5b89'
+            '66c41a1b299c3896c2b61e170894c070e0870534992e27ae0cb7ebe770b680c0'
             '9817dbe692317b2f8c691e94ab18de7ca88310bb51567ab85e2397ecddae90d2'
-            'fa2e4f952a5c62abfaff623fd65c14631d4b71a27eec3c033897011e39aa50e1'
-            'd50325e1090043dabb5d6989ac001f22c22865232c7bdb382d0218547e98bed7'
-            '84c1661c58425896646395045b57b6d4d4fce56db5ccbe6cb18eee3dfdf6867c'
+            '836ba462fa0337777955d30309a29a245d1ef4fd10498006ac0b3e5c6c56f5ce'
+            '2b0fdc940770d932cb0216ad424802141bd592971b513dea34b797a1b232b0c1'
+            'f64dd99c723e3666f5c74fe8c61acd64aeaeb99e0f207c0af0f32dc17dab26b0'
             '338067a69134ce47784d1dcb48b26963c236c871ee0ae9df67402bae9a00a99b'
             '8dd67cc4008f86254ff6a93732ec9c7138d1e8f75324d880663f5a9a87abe5d0'
             '8e3a51f2a8e6a6598f134c4d22f8a6308deecf63a37cc1265fe8b81baf0bc4a8'

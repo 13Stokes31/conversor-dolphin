@@ -24,6 +24,8 @@ ok()  { kdialog --title "$TITULO" --passivepopup "$1" 6 >/dev/null 2>&1 || true;
 (( $# >= 2 )) || err "Selecciona al menos dos archivos PDF para unir."
 
 files=("$@")
+# No confundir un nombre «-algo» con una opción de pdfunite.
+for i in "${!files[@]}"; do [[ "${files[i]}" == -* ]] && files[i]="./${files[i]}"; done
 dir=$(dirname -- "${files[0]}")
 
 # --- Diálogo de ordenación: lista numerada y editable ---
