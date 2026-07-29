@@ -55,8 +55,6 @@ terminar; diálogo de error (y limpieza de lo dejado a medias) si algo falla.
 
 ### Desde AUR  *(recomendado en Arch / EndeavourOS)*
 
-Una vez publicado el paquete (ver [PACKAGING.md](PACKAGING.md)):
-
 ```bash
 yay -S conversor-dolphin      # o: paru -S conversor-dolphin
 ```
