@@ -3,6 +3,16 @@
 Todas las novedades relevantes de este proyecto se documentan aquí.
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/).
 
+## [1.3.1-2] — 2026-07-30
+
+Solo empaquetado, sin cambios de código ni de uso.
+
+### Cambiado
+- **PKGBUILD**: pasa de fuentes locales autocontenidas a descargar el tarball
+  de la etiqueta `v1.3.1` de GitHub (petición de un revisor de AUR: el repo de
+  AUR no debe alojar copias del código fuente). El repo de AUR ahora solo
+  lleva `PKGBUILD`, `.SRCINFO` y `conversor-dolphin.install`.
+
 ## [1.3.1] — 2026-06-21
 
 Correcciones y mejoras de calidad, sin cambios de uso.

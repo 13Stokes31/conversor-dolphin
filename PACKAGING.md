@@ -1,20 +1,25 @@
 # Empaquetado y publicación en AUR
 
-El repositorio ya es un paquete listo: contiene `PKGBUILD`, `.SRCINFO` y todas
-las fuentes (los `.sh`, los `.desktop`, el `Makefile`, `LICENSE` y el `.install`).
-El `PKGBUILD` es **autocontenido**: usa las fuentes locales, así que construye y
-se publica sin necesidad de alojar nada en otro sitio.
+El `PKGBUILD` descarga las fuentes del *release* etiquetado en GitHub (no usa
+copias locales): `source` apunta al tarball de la etiqueta `v$pkgver`. Por eso
+el repo de AUR solo debe llevar `PKGBUILD`, `.SRCINFO` y `conversor-dolphin.install`
+— nada de `.sh`, `.desktop`, `Makefile` ni `LICENSE` (esos viven únicamente
+aquí y en GitHub).
+
+> El `conversor-dolphin.install`, al referenciarse con `install=`, AUR lo toma
+> del propio repo de AUR, no del tarball: por eso debe seguir presente junto
+> al `PKGBUILD` en ambos sitios.
 
 ## Construir y probar en local
 
 ```bash
-makepkg -f                 # construye el paquete
+makepkg -f                 # descarga el tarball del tag y construye el paquete
 namcap PKGBUILD            # (opcional) lint del PKGBUILD
 namcap *.pkg.tar.zst       # (opcional) lint del paquete construido
 makepkg -si                # construye e instala con pacman
 ```
 
-> Si tocas cualquier fuente, regenera sumas y `.SRCINFO`:
+> Tras publicar una etiqueta nueva en GitHub, regenera sumas y `.SRCINFO`:
 > ```bash
 > updpkgsums
 > makepkg --printsrcinfo > .SRCINFO
@@ -22,53 +27,30 @@ makepkg -si                # construye e instala con pacman
 
 ## Publicar en AUR
 
-1. **Comprueba que el nombre está libre** en <https://aur.archlinux.org/packages?K=conversor-dolphin>.
-   Si lo prefieres más descubrible, podrías renombrarlo (p. ej. `dolphin-pdf-servicemenu`):
-   habría que cambiar `pkgname`, el nombre de los `.desktop`/`.install` y la variable
-   `NAME` del `Makefile`.
+1. **Sube tu clave SSH** a tu cuenta de AUR (Mi Cuenta → SSH Public Key).
 
-2. **Sube tu clave SSH** a tu cuenta de AUR (Mi Cuenta → SSH Public Key).
-
-3. **Clona el repo AUR vacío y copia los ficheros del paquete:**
+2. **Clona el repo de AUR y copia solo los tres ficheros de empaquetado:**
 
    ```bash
    git clone ssh://aur@aur.archlinux.org/conversor-dolphin.git aur-conversor
    cd aur-conversor
-   cp ../conversor-dolphin/{PKGBUILD,.SRCINFO,conversor-dolphin.install,Makefile,LICENSE} .
-   cp ../conversor-dolphin/*.sh .
-   cp ../conversor-dolphin/conversor-dolphin-*.desktop .
+   cp ../conversor-dolphin/{PKGBUILD,.SRCINFO,conversor-dolphin.install} .
    git add -A
-   git commit -m "Initial import: conversor-dolphin 1.0.0-1"
+   git commit -m "conversor-dolphin 1.3.1-2: fuentes desde el tag de GitHub"
+   git branch -m master   # AUR exige que la rama se llame «master», no «main»
    git push
    ```
 
-   El repo de AUR debe llevar **siempre** `PKGBUILD` y `.SRCINFO` en la raíz, más
-   las fuentes que el `PKGBUILD` referencia. No subas `pkg/`, `src/` ni los
-   `*.pkg.tar.zst` (ya están en `.gitignore`).
-
-## Alternativa: fuentes desde un *release* de GitHub
-
-Si prefieres el flujo «clásico» (el AUR descarga un tarball publicado, y el repo
-AUR solo lleva `PKGBUILD`, `.SRCINFO` y `conversor-dolphin.install`), sube primero
-este proyecto a GitHub y crea una etiqueta `v1.0.0`. Luego usa este `source`:
-
-```bash
-url="https://github.com/TUUSUARIO/conversor-dolphin"
-source=("$pkgname-$pkgver.tar.gz::$url/archive/refs/tags/v$pkgver.tar.gz")
-sha256sums=('SKIP')   # después: updpkgsums
-
-package() {
-    make -C "$srcdir/$pkgname-$pkgver" DESTDIR="$pkgdir" PREFIX=/usr install
-}
-```
-
-(El `conversor-dolphin.install`, al referenciarse con `install=`, se toma del
-propio repo AUR, no del tarball: por eso debe seguir presente junto al PKGBUILD.)
+   El repo de AUR lleva **siempre y solo** `PKGBUILD`, `.SRCINFO` y
+   `conversor-dolphin.install` en la raíz. Nada de `pkg/`, `src/`,
+   `*.pkg.tar.zst` (ya están en `.gitignore`) ni copias del código fuente.
 
 ## Actualizar a una versión nueva
 
-1. Sube `pkgver` (y reinicia `pkgrel=1`) en `PKGBUILD`. Si solo cambia el
-   empaquetado, sube `pkgrel`.
-2. Anota los cambios en `CHANGELOG.md`.
-3. `updpkgsums && makepkg --printsrcinfo > .SRCINFO`
-4. `git commit` y `git push` al remoto de AUR.
+1. Crea la etiqueta `vX.Y.Z` en GitHub y haz push del tag.
+2. Sube `pkgver` (y reinicia `pkgrel=1`) en `PKGBUILD`. Si solo cambia el
+   empaquetado sin nueva versión de código, sube `pkgrel`.
+3. Anota los cambios en `CHANGELOG.md`.
+4. `updpkgsums && makepkg --printsrcinfo > .SRCINFO`
+5. Copia `PKGBUILD` y `.SRCINFO` (y `conversor-dolphin.install` si cambió) al
+   clon del repo de AUR, `git commit` y `git push`.

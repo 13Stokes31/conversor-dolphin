@@ -3,3 +3,4 @@
 /src/
 *.pkg.tar.*
 *.log
+/conversor-dolphin-*.tar.gz
