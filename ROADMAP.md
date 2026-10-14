@@ -22,8 +22,9 @@ La etiqueta de código `v1.3.2` está publicada en GitHub. La receta de AUR est�
 publicada como `1.3.2-1`, utilizando su tarball descargado y una suma SHA256
 verificada. El paquete se ha construido e inspeccionado con esa receta real.
 Solo se mantiene `conversor-dolphin`: no hay compilación que justifique una
-variante `-bin`. El clon de publicación está en `aur/conversor-dolphin`,
-sincronizado con AUR, separado del historial principal e ignorado por Git.
+variante `-bin`. Los commits de desarrollo y empaquetado están guardados en
+GitHub y AUR. Los clones locales usados en la revisión no necesitan conservarse;
+se pueden recrear siguiendo README y PACKAGING para trabajar en otra versión.
 
 ## Para las siguientes versiones
 

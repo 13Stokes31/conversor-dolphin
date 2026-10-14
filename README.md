@@ -77,8 +77,11 @@ que adaptar el nombre del paquete y el gestor indicado en el diálogo.
 En Arch / EndeavourOS, la última **versión publicada** está en AUR:
 
 ```bash
-yay -S conversor-dolphin
+paru -S conversor-dolphin             # o: yay -S conversor-dolphin
 ```
+
+La instalación desde AUR no necesita conservar una copia local del repositorio
+de desarrollo.
 
 Para instalar el **código de este directorio** manteniendo una instalación
 gestionada por pacman:
@@ -135,6 +138,13 @@ Después ejecuta `kbuildsycoca6`. La desinstalación manual conserva archivos aj
 al proyecto y no elimina las conversiones realizadas.
 
 ## Desarrollo
+
+Para obtener de nuevo las fuentes:
+
+```bash
+git clone https://github.com/13Stokes31/conversor-dolphin.git
+cd conversor-dolphin
+```
 
 ```bash
 make check             # sintaxis Bash y ShellCheck

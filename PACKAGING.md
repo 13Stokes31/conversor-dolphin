@@ -8,15 +8,23 @@ se lee del repositorio de AUR, por lo que debe mantenerse sincronizado.
 Solo se mantiene `conversor-dolphin`. No existe ni hace falta una variante
 `conversor-dolphin-bin`: los scripts y menús se instalan sin compilar.
 
-El clon de preparación está en `aur/conversor-dolphin`, ignorado por el
-repositorio principal. Tiene su propio historial en la rama `master`, utiliza
-HTTPS para consultar AUR y SSH para publicar. Preparar y confirmar sus archivos
-no publica la actualización: el último paso es el push a AUR.
+Para preparar otra actualización, crea el clon de AUR dentro de una nueva copia
+del repositorio de desarrollo:
+
+```bash
+git clone https://aur.archlinux.org/conversor-dolphin.git aur/conversor-dolphin
+git -C aur/conversor-dolphin remote set-url --push origin ssh://aur@aur.archlinux.org/conversor-dolphin.git
+```
+
+Esta carpeta está ignorada por el repositorio principal y tiene su propio
+historial en `master`. Usa HTTPS para consultar AUR y SSH para publicar.
+Preparar y confirmar sus archivos no publica la actualización: el último paso
+es el push a AUR. Una vez sincronizado, el clon local puede retirarse.
 
 ## Versión publicada: 1.3.2-1
 
-La etiqueta `v1.3.2` ya está disponible en GitHub. El PKGBUILD de la raíz y el
-del clon de AUR utilizan ese tarball con su SHA256 verificada; `.SRCINFO` está
+La etiqueta `v1.3.2` ya está disponible en GitHub. El PKGBUILD de este repositorio
+y el publicado en AUR utilizan ese tarball con su SHA256 verificada; `.SRCINFO` está
 regenerado y el paquete se ha construido e inspeccionado correctamente.
 La actualización, con solo los tres archivos de empaquetado, está publicada
 en AUR mediante el commit `7745695`. La API pública confirma `1.3.2-1`.

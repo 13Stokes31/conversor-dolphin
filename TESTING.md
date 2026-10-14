@@ -157,7 +157,8 @@ La inspección visual de Dolphin continúa pendiente.
 - Commit `7745695` publicado en `master` del repositorio de AUR. Comprobada la
   referencia remota y confirmada la versión `1.3.2-1` con la API pública.
 - La primera consulta de la API devolvió la versión anterior desde caché;
-  una consulta sin caché confirmó la actualización. El clon está sincronizado.
+  una consulta sin caché confirmó la actualización. Se comprobó que el clon
+  estaba sincronizado.
 - Desinstalación con `pacman -Rs`: retirados `conversor-dolphin` y `kdialog`.
   Pacman conservó las dependencias compartidas o instaladas explícitamente.
 - Comprobado que ambos paquetes ya no están registrados y que se retiraron
@@ -168,3 +169,16 @@ La inspección visual de Dolphin continúa pendiente.
 El equipo queda sin el conversor, listo para instalar la versión publicada
 mediante `paru -S conversor-dolphin`. Esta fase no modifica el código del paquete;
 no requiere repetir las conversiones ya verificadas.
+
+## Cierre de la revisión local — 2026-10-14
+
+Se comprobaron los repositorios de desarrollo y AUR tras consultar sus remotos:
+sin modificaciones locales, commits pendientes de publicar ni temporales de
+pruebas. Los únicos archivos ignorados eran los del clon de AUR ya sincronizado.
+La documentación se actualiza y publica antes de retirar ambas copias locales
+por petición del usuario. El historial y los resultados permanecen en GitHub y
+AUR; los clones pueden recrearse con las instrucciones de README y PACKAGING.
+
+Este cierre solo afecta a los repositorios locales, no a documentos convertidos
+ni a una instalación del paquete gestionada por pacman. Son cambios de
+documentación; no requieren repetir las pruebas de conversión.
