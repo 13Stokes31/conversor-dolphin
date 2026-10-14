@@ -17,8 +17,9 @@ pendiente. La versión publicada en AUR continúa siendo la anterior.
 
 ## Preparación de 1.3.2-1
 
-La revisión se incorpora a la versión de código `1.3.2`. La receta de AUR se
-actualiza como `1.3.2-1`, utilizando el tarball de su etiqueta y una suma SHA256.
+La etiqueta de código `v1.3.2` está publicada en GitHub. La receta de AUR está
+preparada como `1.3.2-1`, utilizando su tarball descargado y una suma SHA256
+verificada. El paquete se ha construido e inspeccionado con esa receta real.
 Solo se mantiene `conversor-dolphin`: no hay compilación que justifique una
 variante `-bin`. El clon de publicación se prepara en `aur/conversor-dolphin`,
 separado del historial principal e ignorado por Git.

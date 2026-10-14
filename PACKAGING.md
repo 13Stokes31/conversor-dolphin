@@ -13,6 +13,18 @@ repositorio principal. Tiene su propio historial en la rama `master`, utiliza
 HTTPS para consultar AUR y SSH para publicar. Preparar y confirmar sus archivos
 no publica la actualización: el último paso es el push a AUR.
 
+## Actualización preparada: 1.3.2-1
+
+La etiqueta `v1.3.2` ya está disponible en GitHub. El PKGBUILD de la raíz y el
+del clon de AUR utilizan ese tarball con su SHA256 verificada; `.SRCINFO` está
+regenerado y el paquete se ha construido e inspeccionado correctamente.
+La actualización del clon contiene solo los tres archivos de empaquetado.
+La evidencia y la suma completa están en TESTING.
+
+Mientras no se suba el commit de ese clon a AUR, los helpers seguirán obteniendo
+la versión anterior. La instalación local revisada sigue siendo el paquete
+`1.3.1-2` registrado en TESTING; preparar esta actualización no lo reinstala.
+
 ## Probar el código local
 
 ```bash

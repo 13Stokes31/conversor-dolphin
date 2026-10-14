@@ -124,3 +124,30 @@ queda pendiente la publicación de una nueva versión en AUR.
 La verificación con la API de KDE no sustituye la inspección visual en una
 ventana de Dolphin. Si estaba abierto y mantiene un menú anterior, cierra sus
 ventanas y vuelve a abrirlo. No se han cerrado automáticamente ventanas del usuario.
+
+## Preparación de AUR 1.3.2-1 — 2026-10-14
+
+- La API pública de AUR devuelve únicamente `conversor-dolphin`, todavía en
+  `1.3.1-2`; no existe `conversor-dolphin-bin`. No hace falta esa variante para
+  scripts y menús que no se compilan.
+- Etiqueta `v1.3.2` publicada en GitHub y tarball descargado desde la URL que
+  utiliza el PKGBUILD. SHA256 comprobada:
+
+  ```text
+  0b103575b26a453c9db6e7d1a42df8fad1093f7ad1ba27b4aed17d9d96a61463
+  ```
+
+- `makepkg --force --noconfirm --nosign` con la receta real de AUR: construcción
+  correcta de `conversor-dolphin-1.3.2-1-any.pkg.tar.zst`, sin instalarlo.
+- Paquete inspeccionado con bsdtar: veinte archivos de aplicación, propietario
+  root, dependencias y versión correctas, sin archivos inesperados. Los once
+  scripts y la licencia coinciden byte a byte con el código revisado; los menús
+  coinciden tras normalizar las comillas de sus rutas Exec.
+- PKGBUILD y `.SRCINFO` sincronizados; la receta principal, la construida y la
+  copiada al clon de AUR son idénticas. Sintaxis Bash y ShellCheck correctos.
+
+No se han cambiado los conversores desde las 43 pruebas y las siete comprobaciones
+de KIO registradas anteriormente. Esta validación comprueba la versión y el
+empaquetado de las mismas fuentes. El clon `aur/conversor-dolphin` queda preparado
+en `master`, con solo los tres archivos de AUR; la publicación allí se realiza
+por separado. La inspección visual de Dolphin continúa pendiente.
