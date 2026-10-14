@@ -15,7 +15,15 @@ mediante pacman. La comprobación nativa de KIO confirma el icono de imagen y
 los filtros de archivos y protocolos; la inspección visual en Dolphin sigue
 pendiente. La versión publicada en AUR continúa siendo la anterior.
 
-## Antes de publicar la siguiente versión
+## Preparación de 1.3.2-1
+
+La revisión se incorpora a la versión de código `1.3.2`. La receta de AUR se
+actualiza como `1.3.2-1`, utilizando el tarball de su etiqueta y una suma SHA256.
+Solo se mantiene `conversor-dolphin`: no hay compilación que justifique una
+variante `-bin`. El clon de publicación se prepara en `aur/conversor-dolphin`,
+separado del historial principal e ignorado por Git.
+
+## Antes de publicar en AUR
 
 1. Completar la comprobación visual de Dolphin descrita en TESTING: icono del
    submenú, traducciones, filtros MIME, selección múltiple y ausencia de acciones
@@ -23,8 +31,9 @@ pendiente. La versión publicada en AUR continúa siendo la anterior.
 2. Revisar los cambios y ejecutar `make check`, `make test-integration` y
    `make test-package` en el entorno de publicación. Con los menús instalados y
    las herramientas de desarrollo de KDE disponibles, ejecutar `make test-kde`.
-3. Crear una versión y etiqueta nuevas; actualizar PKGBUILD, sumas y `.SRCINFO`
-   según PACKAGING. Hasta entonces AUR continúa sirviendo la versión anterior.
+3. Revisar el commit preparado en el clon de AUR y subirlo según PACKAGING.
+   Preparar una actualización local o publicar la etiqueta en GitHub no cambia
+   la versión que sirve AUR.
 
 ## Mejoras posteriores, si el uso las justifica
 

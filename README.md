@@ -112,9 +112,12 @@ en una raíz temporal. Las rutas `Exec` se ajustan al prefijo, sin incluir `DEST
 make test-package
 ```
 
-Las correcciones de la sección «Sin publicar» del CHANGELOG estarán disponibles
-en AUR después de publicar una nueva versión. El empaquetado publicado se mantiene
-intacto hasta disponer de la etiqueta y su suma de comprobación.
+Cada nueva versión llega a AUR cuando se actualiza allí el PKGBUILD con su
+etiqueta y suma de comprobación. Subir código a GitHub no actualiza por sí mismo
+el paquete de AUR. Consulta PACKAGING para preparar esa actualización.
+
+El paquete se llama `conversor-dolphin`. No necesita una variante `-bin`: contiene
+scripts Bash y archivos de menú, sin un ejecutable que haya que compilar.
 
 Si quedan menús de instalaciones antiguas, localiza `pdf-unir.desktop` y
 `pdf-dividir.desktop` en `/usr/share/kio/servicemenus/` y retira únicamente esos

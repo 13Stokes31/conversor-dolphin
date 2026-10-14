@@ -5,6 +5,14 @@ AUR contiene únicamente `PKGBUILD`, `.SRCINFO` y `conversor-dolphin.install`.
 El código, Makefile y licencia se obtienen del tarball. El archivo `.install`
 se lee del repositorio de AUR, por lo que debe mantenerse sincronizado.
 
+Solo se mantiene `conversor-dolphin`. No existe ni hace falta una variante
+`conversor-dolphin-bin`: los scripts y menús se instalan sin compilar.
+
+El clon de preparación está en `aur/conversor-dolphin`, ignorado por el
+repositorio principal. Tiene su propio historial en la rama `master`, utiliza
+HTTPS para consultar AUR y SSH para publicar. Preparar y confirmar sus archivos
+no publica la actualización: el último paso es el push a AUR.
+
 ## Probar el código local
 
 ```bash
@@ -76,6 +84,16 @@ Estos comandos usan la etiqueta publicada y no verifican los cambios locales.
    PKGBUILD, `.SRCINFO` y `conversor-dolphin.install` al clon de AUR.
 6. Revisa el diff, confirma los tres archivos y publica en la rama `master`
    que requiere AUR. No incluyas fuentes, `src/`, `pkg/` ni paquetes binarios.
+
+Con el clon preparado, la publicación se realiza con:
+
+```bash
+git -C aur/conversor-dolphin push origin master
+```
+
+Requiere que la cuenta de AUR tenga autorizada la clave SSH del usuario.
+La validación del tarball de una etiqueta nueva debe construir con el PKGBUILD
+real de AUR, además de la comprobación local `make test-package`.
 
 No uses `SKIP` como suma ni apuntes a una etiqueta que aún no exista.
 Las pruebas locales no necesitan publicar, instalar o cambiar el sistema.

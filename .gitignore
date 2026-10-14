@@ -6,3 +6,5 @@
 /conversor-dolphin-*.tar.gz
 /tests/.tmp/
 __pycache__/
+# Clon independiente para preparar la publicación del paquete de AUR.
+/aur/

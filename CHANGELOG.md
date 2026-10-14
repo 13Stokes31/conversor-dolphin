@@ -3,7 +3,7 @@
 Todas las novedades relevantes de este proyecto se documentan aquí.
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/).
 
-## Sin publicar — revisión de 2026-10-13
+## [1.3.2] — 2026-10-14
 
 ### Corregido
 - «Convertir imagen» hereda un icono de imagen; los menús PDF tienen icono PDF.
