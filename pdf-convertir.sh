@@ -10,31 +10,16 @@
 #
 # Errores: kdialog --error. Avisos de éxito con popup pasivo (no intrusivo).
 
-set -euo pipefail
+set -Eeuo pipefail
 
 TITULO="Convertir PDF"
-err()  { kdialog --title "$TITULO" --error "$1"; exit 1; }
-ok()   { kdialog --title "$TITULO" --passivepopup "$1" 6 >/dev/null 2>&1 || true; }
-need() { command -v "$1" >/dev/null || err "Falta la herramienta «$1».\n\nInstálala con:\n    sudo pacman -S $2"; }
-
-errf=$(mktemp)
-trap 'rm -f "$errf"' EXIT
-
+# shellcheck source=comun.sh
+source "$(dirname -- "${BASH_SOURCE[0]}")/comun.sh"
 (( $# == 2 )) || err "Uso interno incorrecto del script de conversión."
 modo="$1"
-file="$2"
-[[ -f "$file" ]] || err "El archivo no existe:\n$file"
-[[ "$file" == -* ]] && file="./$file"   # no confundir un nombre «-algo» con una opción
-
-dir=$(dirname -- "$file")
-stem=$(basename -- "$file" .pdf)
-
-# Imprime una ruta libre «<base>.<ext>», añadiendo -2, -3… si ya existe.
-salida_libre() {
-    local base="$1" ext="$2" out="$1.$2" n=2
-    while [[ -e "$out" ]]; do out="${base}-${n}.${ext}"; n=$((n + 1)); done
-    printf '%s' "$out"
-}
+validar_archivos "$2"
+ruta_archivo "$2"; file="$f"; dir="$d"; stem="$s"
+iniciar_temporales
 
 case "$modo" in
     imagenes)
@@ -44,7 +29,7 @@ case "$modo" in
             "PNG · 150 ppp (calidad media)" \
             "PNG · 300 ppp (alta calidad)" \
             "JPG · 150 ppp (más ligero)" \
-            "JPG · 300 ppp") || exit 0
+            "JPG · 300 ppp") || cancelar
         case "$sel" in
             PNG*150*) flag=-png;  fmt=png; dpi=150 ;;
             PNG*300*) flag=-png;  fmt=png; dpi=300 ;;
@@ -52,23 +37,28 @@ case "$modo" in
             JPG*300*) flag=-jpeg; fmt=jpg; dpi=300 ;;
             *) exit 0 ;;
         esac
-        outdir="$dir/$stem-imagenes"; n=2
-        while [[ -e "$outdir" ]]; do outdir="$dir/$stem-imagenes-$n"; n=$((n + 1)); done
-        mkdir -p "$outdir"
+        nuevo_temporal "$dir"
+        outdir="$trabajo/imagenes"
+        mkdir -- "$outdir"
         if ! pdftoppm "$flag" -r "$dpi" "$file" "$outdir/$stem" 2>"$errf"; then
-            rm -rf "$outdir"
             err "No se pudo convertir a imágenes:\n$(cat "$errf" 2>/dev/null || echo 'error desconocido')"
         fi
-        num=$(find "$outdir" -maxdepth 1 -type f -name "*.$fmt" | wc -l)
-        ok "$num imágenes ($fmt) creadas en:\n$(basename -- "$outdir")/"
+        shopt -s nullglob
+        imagenes=("$outdir"/*."$fmt")
+        num="${#imagenes[@]}"
+        (( num > 0 )) || err "No se generó ninguna imagen."
+        publicar "$outdir" "$dir/$stem-imagenes"
+        ok "$num imágenes ($fmt) creadas en:\n${resultado##*/}/"
         ;;
 
     texto)
-        out=$(salida_libre "$dir/$stem" txt)
+        nuevo_temporal "$dir"
+        out="$trabajo/salida.txt"
         if ! pdftotext "$file" "$out" 2>"$errf"; then
             err "No se pudo extraer el texto:\n$(cat "$errf" 2>/dev/null || echo 'error desconocido')"
         fi
-        ok "Texto extraído en:\n$(basename -- "$out")"
+        publicar "$out" "$dir/$stem" .txt
+        ok "Texto extraído en:\n${resultado##*/}"
         ;;
 
     comprimir)
@@ -76,24 +66,24 @@ case "$modo" in
         sel=$(kdialog --title "$TITULO" --combobox "Nivel de compresión:" \
             "ebook · equilibrado (recomendado)" \
             "screen · máxima compresión" \
-            "printer · alta calidad") || exit 0
+            "printer · alta calidad") || cancelar
         case "$sel" in
             ebook*)   nivel=/ebook ;;
             screen*)  nivel=/screen ;;
             printer*) nivel=/printer ;;
             *) exit 0 ;;
         esac
-        out=$(salida_libre "$dir/$stem-comprimido" pdf)
+        nuevo_temporal "$dir"
+        out="$trabajo/salida.pdf"
         if ! gs -sDEVICE=pdfwrite -dCompatibilityLevel=1.4 -dPDFSETTINGS="$nivel" \
                 -dNOPAUSE -dQUIET -dBATCH -sOutputFile="$out" "$file" 2>"$errf"; then
-            rm -f "$out"
             err "No se pudo comprimir el PDF:\n$(cat "$errf" 2>/dev/null || echo 'error desconocido')"
         fi
-        antes=$(stat -c%s "$file"); despues=$(stat -c%s "$out")
+        antes=$(stat -c%s -- "$file"); despues=$(stat -c%s -- "$out")
         if (( despues < antes )); then
-            ok "PDF comprimido ($(( 100 - despues * 100 / antes ))% más pequeño):\n$(basename -- "$out")"
+            publicar "$out" "$dir/$stem-comprimido" .pdf
+            ok "PDF comprimido ($(( 100 - despues * 100 / antes ))% más pequeño):\n${resultado##*/}"
         else
-            rm -f "$out"
             ok "El PDF ya estaba optimizado; no se generó ninguna copia."
         fi
         ;;
@@ -103,12 +93,13 @@ case "$modo" in
             || err "Falta «ocrmypdf» (está en AUR, no en los repos oficiales).\n\nInstálalo con:\n    yay -S ocrmypdf"
         # Idioma por defecto: español (tesseract-data-spa). Para otros idiomas,
         # instala tesseract-data-<idioma> y cambia «-l spa» abajo (p. ej. spa+eng).
-        out=$(salida_libre "$dir/$stem-ocr" pdf)
+        nuevo_temporal "$dir"
+        out="$trabajo/salida.pdf"
         if ! ocrmypdf --skip-text -l spa "$file" "$out" 2>"$errf"; then
-            rm -f "$out"
             err "No se pudo aplicar OCR:\n$(tail -3 "$errf" 2>/dev/null || echo 'error desconocido')"
         fi
-        ok "OCR aplicado (texto buscable):\n$(basename -- "$out")"
+        publicar "$out" "$dir/$stem-ocr" .pdf
+        ok "OCR aplicado (texto buscable):\n${resultado##*/}"
         ;;
 
     *)

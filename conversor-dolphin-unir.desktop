@@ -1,5 +1,6 @@
 [Desktop Entry]
 Type=Service
+X-KDE-Protocol=file
 X-KDE-Priority=TopLevel
 MimeType=application/pdf;
 X-KDE-MinNumberOfUrls=2
@@ -10,5 +11,5 @@ X-KDE-Submenu[es]=Acciones PDF
 [Desktop Action pdfUnir]
 Name=Merge selected PDFs…
 Name[es]=Unir los PDF seleccionados…
-Icon=merge
+Icon=application-pdf
 Exec=/usr/share/conversor-dolphin/pdf-unir.sh %F

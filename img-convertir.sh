@@ -8,11 +8,11 @@
 # sobrescribir (añade -2, -3…). Admite HEIC/HEIF de entrada (fotos de móvil;
 # requiere el delegado libheif en ImageMagick).
 
-set -euo pipefail
+set -Eeuo pipefail
 
 TITULO="Convertir imagen"
-err() { kdialog --title "$TITULO" --error "$1"; exit 1; }
-ok()  { kdialog --title "$TITULO" --passivepopup "$1" 6 >/dev/null 2>&1 || true; }
+# shellcheck source=comun.sh
+source "$(dirname -- "${BASH_SOURCE[0]}")/comun.sh"
 
 IM=$(command -v magick || command -v convert || true)
 [[ -n "$IM" ]] || err "Falta ImageMagick.\n\nInstálalo con:\n    sudo pacman -S imagemagick"
@@ -28,24 +28,28 @@ case "$fmt" in
     *) err "Formato de imagen desconocido: $fmt" ;;
 esac
 
-errf=$(mktemp)
-trap 'rm -f "$errf"' EXIT
-hechos=0
+validar_archivos "$@"
+iniciar_temporales
 for f in "$@"; do
-    [[ -f "$f" ]] || continue
-    [[ "$f" == -* ]] && f="./$f"        # no confundir un nombre «-algo» con una opción
-    d=$(dirname -- "$f"); s=$(basename -- "$f"); s="${s%.*}"
-    out="$d/$s.$ext"; n=2
-    while [[ -e "$out" ]]; do out="$d/$s-$n.$ext"; n=$((n + 1)); done
-    # «[0]»: si la entrada tiene varios fotogramas/páginas (GIF animado, TIFF
-    # multipágina) toma solo el primero, para no generar salida-0, salida-1…
-    if ! "$IM" "${f}[0]" "${opts[@]}" "$out" 2>"$errf"; then
-        rm -f "$out"
+    ruta_archivo "$f"
+    nuevo_temporal "$d"
+    out="$trabajo/salida.$ext"
+    if [[ "${IM##*/}" == magick ]]; then identificar=("$IM" identify); else identificar=(identify); fi
+    if ! fotogramas=$("${identificar[@]}" -ping -format '%n\n' - <"$f" 2>"$errf"); then
+        err "No se pudo leer «${f##*/}»:\n$(tail -2 "$errf")"
+    fi
+    fotogramas="${fotogramas%%$'\n'*}"
+    if [[ "$fotogramas" =~ ^[0-9]+$ ]] && (( fotogramas > 1 )); then
+        kdialog --title "$TITULO" --yesno "«${f##*/}» contiene $fotogramas fotogramas/páginas.\nSolo se convertirá el primero. ¿Continuar?" || cancelar
+    fi
+    # stdin/stdout evitan que ImageMagick interprete %, [] o glob en las rutas.
+    # «[0]» limita la entrada a su primer fotograma/página.
+    if ! "$IM" '-[0]' "${opts[@]}" "$fmt:-" <"$f" >"$out" 2>"$errf"; then
         err "No se pudo convertir «$(basename -- "$f")»:\n$(tail -2 "$errf" 2>/dev/null || echo 'error desconocido')"
     fi
+    publicar "$out" "$d/$s" ".$ext"
     hechos=$((hechos + 1))
 done
 
-(( hechos > 0 )) || err "No se seleccionó ninguna imagen válida."
 ok "$hechos imagen(es) convertida(s) a $fmt."
 exit 0

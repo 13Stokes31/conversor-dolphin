@@ -1,8 +1,9 @@
 [Desktop Entry]
 Type=Service
+X-KDE-Protocol=file
 X-KDE-Priority=TopLevel
 MimeType=image/jpeg;image/png;image/webp;image/tiff;image/bmp;image/gif;image/heif;image/heic;image/avif;
-Actions=imgToPdf;imgToJpg;imgToPng;imgToWebp;imgToAvif;imgToTiff
+Actions=imgToPng;imgToJpg;imgToWebp;imgToAvif;imgToTiff;imgToPdf
 X-KDE-Submenu=Convert image
 X-KDE-Submenu[es]=Convertir imagen
 

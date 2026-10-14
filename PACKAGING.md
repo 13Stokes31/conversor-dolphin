@@ -1,56 +1,81 @@
 # Empaquetado y publicación en AUR
 
-El `PKGBUILD` descarga las fuentes del *release* etiquetado en GitHub (no usa
-copias locales): `source` apunta al tarball de la etiqueta `v$pkgver`. Por eso
-el repo de AUR solo debe llevar `PKGBUILD`, `.SRCINFO` y `conversor-dolphin.install`
-— nada de `.sh`, `.desktop`, `Makefile` ni `LICENSE` (esos viven únicamente
-aquí y en GitHub).
+`PKGBUILD` descarga el tarball de la etiqueta GitHub `v$pkgver`. El repositorio de
+AUR contiene únicamente `PKGBUILD`, `.SRCINFO` y `conversor-dolphin.install`.
+El código, Makefile y licencia se obtienen del tarball. El archivo `.install`
+se lee del repositorio de AUR, por lo que debe mantenerse sincronizado.
 
-> El `conversor-dolphin.install`, al referenciarse con `install=`, AUR lo toma
-> del propio repo de AUR, no del tarball: por eso debe seguir presente junto
-> al `PKGBUILD` en ambos sitios.
-
-## Construir y probar en local
+## Probar el código local
 
 ```bash
-makepkg -f                 # descarga el tarball del tag y construye el paquete
-namcap PKGBUILD            # (opcional) lint del PKGBUILD
-namcap *.pkg.tar.zst       # (opcional) lint del paquete construido
-makepkg -si                # construye e instala con pacman
+make check
+make test-integration
+make test-package
 ```
 
-> Tras publicar una etiqueta nueva en GitHub, regenera sumas y `.SRCINFO`:
-> ```bash
-> updpkgsums
-> makepkg --printsrcinfo > .SRCINFO
-> ```
+`test-package` genera un tarball del código actual en `tests/.tmp`, copia el
+PKGBUILD y sustituye **solo en esa copia** la fuente remota por el archivo local
+y su SHA256. Ejecuta makepkg sin instalar ni descargar dependencias, verifica
+los once scripts (incluido `comun.sh`), ocho menús, licencia, dependencias,
+propietario root y ausencia de archivos inesperados en el paquete.
+Si namcap está instalado también lo ejecuta. Al terminar limpia todos
+los artefactos de esa construcción.
 
-## Publicar en AUR
+Requiere Arch o un entorno compatible con makepkg, pacman y bsdtar, ejecutado
+como usuario sin privilegios. `poppler` y `kdialog` deben estar instalados.
+La versión del paquete de prueba es la del PKGBUILD vigente; es un artefacto
+local de validación, no una versión publicable.
 
-1. **Sube tu clave SSH** a tu cuenta de AUR (Mi Cuenta → SSH Public Key).
+## Instalar el código revisado en el equipo local
 
-2. **Clona el repo de AUR y copia solo los tres ficheros de empaquetado:**
+Si la aplicación ya está gestionada por pacman, conserva el paquete verificado:
+
+```bash
+python3 -B tests/paquete_local.py --output-dir tests/.tmp/paquetes-locales
+```
+
+Instala la ruta exacta mostrada por el comando con `sudo pacman -U` y refresca
+KDE con `kbuildsycoca6`. La construcción no instala por sí misma ni sobrescribe
+paquetes conservados previamente. Esta reinstalación local mantiene la versión
+del PKGBUILD vigente y el registro de archivos de pacman; no publica en AUR.
+Evita superponer `make install` a una instalación gestionada por pacman.
+
+Después se puede ejecutar `make test-kde`, si están disponibles CMake, un
+compilador C++ y los archivos de desarrollo de Qt 6 Widgets y KF6 KIO.
+Comprueba los menús instalados con la API de KIO sin abrir ventanas ni lanzar
+conversiones. Tras instalar y verificar, se pueden retirar los paquetes y
+la construcción de pruebas de `tests/.tmp`.
+
+## Probar la versión publicada
+
+```bash
+makepkg -f
+namcap PKGBUILD              # opcional
+namcap *.pkg.tar.zst         # opcional
+```
+
+Estos comandos usan la etiqueta publicada y no verifican los cambios locales.
+`makepkg -si` además instala el paquete; no es necesario para la revisión.
+
+## Publicar una versión
+
+1. Completa las comprobaciones automáticas y manuales de TESTING.
+2. Elige `X.Y.Z`, mueve «Sin publicar» a esa versión en CHANGELOG y crea la
+   etiqueta `vX.Y.Z` sobre el código final. Publica los commits y la etiqueta.
+3. Cambia `pkgver=X.Y.Z` y `pkgrel=1` en PKGBUILD. Si solo cambia el
+   empaquetado de una versión existente, incrementa `pkgrel`.
+4. Con la etiqueta ya accesible:
 
    ```bash
-   git clone ssh://aur@aur.archlinux.org/conversor-dolphin.git aur-conversor
-   cd aur-conversor
-   cp ../conversor-dolphin/{PKGBUILD,.SRCINFO,conversor-dolphin.install} .
-   git add -A
-   git commit -m "conversor-dolphin 1.3.1-2: fuentes desde el tag de GitHub"
-   git branch -m master   # AUR exige que la rama se llame «master», no «main»
-   git push
+   updpkgsums
+   makepkg --printsrcinfo > .SRCINFO
+   makepkg -f
    ```
 
-   El repo de AUR lleva **siempre y solo** `PKGBUILD`, `.SRCINFO` y
-   `conversor-dolphin.install` en la raíz. Nada de `pkg/`, `src/`,
-   `*.pkg.tar.zst` (ya están en `.gitignore`) ni copias del código fuente.
+5. Revisa el paquete, la fuente descargada y sus metadatos. Copia únicamente
+   PKGBUILD, `.SRCINFO` y `conversor-dolphin.install` al clon de AUR.
+6. Revisa el diff, confirma los tres archivos y publica en la rama `master`
+   que requiere AUR. No incluyas fuentes, `src/`, `pkg/` ni paquetes binarios.
 
-## Actualizar a una versión nueva
-
-1. Crea la etiqueta `vX.Y.Z` en GitHub y haz push del tag.
-2. Sube `pkgver` (y reinicia `pkgrel=1`) en `PKGBUILD`. Si solo cambia el
-   empaquetado sin nueva versión de código, sube `pkgrel`.
-3. Anota los cambios en `CHANGELOG.md`.
-4. `updpkgsums && makepkg --printsrcinfo > .SRCINFO`
-5. Copia `PKGBUILD` y `.SRCINFO` (y `conversor-dolphin.install` si cambió) al
-   clon del repo de AUR, `git commit` y `git push`.
+No uses `SKIP` como suma ni apuntes a una etiqueta que aún no exista.
+Las pruebas locales no necesitan publicar, instalar o cambiar el sistema.

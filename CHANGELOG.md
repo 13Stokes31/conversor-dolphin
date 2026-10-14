@@ -3,6 +3,38 @@
 Todas las novedades relevantes de este proyecto se documentan aquí.
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/).
 
+## Sin publicar — revisión de 2026-10-13
+
+### Corregido
+- «Convertir imagen» hereda un icono de imagen; los menús PDF tienen icono PDF.
+- Todos los menús se restringen a archivos locales (`X-KDE-Protocol=file`).
+- HEIC/HEIF a PDF utiliza ImageMagick como alternativa cuando img2pdf no lee la entrada.
+- Ordenación de imágenes con delimitadores nulos y rutas literales en ImageMagick,
+  incluidos `%d` y corchetes; división de PDF admite porcentajes en nombres y
+  carpetas, extensiones mayúsculas y números con ceros iniciales.
+- Perfiles MP4 con dimensiones pares y `yuv420p`; compresión de vídeo guarda la
+  copia solo si reduce el tamaño.
+- Publicación de archivos y carpetas sin reemplazo, incluidas ejecuciones
+  simultáneas y destinos que sean enlaces simbólicos.
+- Temporales privados y limpieza común ante errores, cancelación e interrupciones;
+  errores de lote informan de los resultados ya completados.
+- La instalación adapta las rutas Exec a PREFIX y respeta rutas con espacios.
+
+### Mejorado
+- Confirmación antes de reducir una imagen animada o multipágina a su primer fotograma.
+- El diálogo de unión explica cómo excluir documentos y valida índices decimales.
+- URI del perfil aislado de LibreOffice escapada para TMPDIR con caracteres especiales.
+- Mensaje de instalación referido a todos los conversores, no solo a PDF.
+
+### Añadido
+- `comun.sh` para la lógica de validación, temporales, diálogos y publicación.
+- Suite persistente con kdialog simulado, conversores reales y pruebas de concurrencia.
+- Objetivos `make check`, `test`, `test-integration` y `test-package`.
+- Comprobación opcional `make test-kde` de los menús instalados con la API nativa;
+  `--output-dir` permite conservar el paquete local verificado para instalarlo.
+- ROADMAP y TESTING; README y PACKAGING actualizados. Retirados la propuesta inicial
+  y el informe anterior, sustituidos por documentación vigente y pruebas reproducibles.
+
 ## [1.3.1-2] — 2026-07-30
 
 Solo empaquetado, sin cambios de código ni de uso.

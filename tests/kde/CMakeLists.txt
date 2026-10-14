@@ -1,0 +1,7 @@
+cmake_minimum_required(VERSION 3.16)
+project(conversor_menu_probe LANGUAGES CXX)
+find_package(Qt6 REQUIRED COMPONENTS Widgets)
+find_package(KF6KIO REQUIRED)
+add_executable(menu-probe menu_probe.cpp)
+target_link_libraries(menu-probe PRIVATE Qt6::Widgets KF6::KIOWidgets)
+target_compile_features(menu-probe PRIVATE cxx_std_17)

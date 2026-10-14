@@ -1,5 +1,6 @@
 [Desktop Entry]
 Type=Service
+X-KDE-Protocol=file
 X-KDE-Priority=TopLevel
 MimeType=application/pdf;
 X-KDE-MaxNumberOfUrls=1
@@ -10,7 +11,7 @@ X-KDE-Submenu[es]=Acciones PDF
 [Desktop Action pdfDivPaginas]
 Name=Split: one file per page
 Name[es]=Dividir: cada página en un archivo
-Icon=split
+Icon=application-pdf
 Exec=/usr/share/conversor-dolphin/pdf-dividir.sh paginas %f
 
 [Desktop Action pdfDivRango]

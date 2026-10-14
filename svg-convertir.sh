@@ -7,11 +7,11 @@
 #   pdf  -> PDF (vectorial, sin pérdida)
 # Usa rsvg-convert (librsvg). Resultado junto al original, sin sobrescribir.
 
-set -euo pipefail
+set -Eeuo pipefail
 
 TITULO="Convertir SVG"
-err() { kdialog --title "$TITULO" --error "$1"; exit 1; }
-ok()  { kdialog --title "$TITULO" --passivepopup "$1" 6 >/dev/null 2>&1 || true; }
+# shellcheck source=comun.sh
+source "$(dirname -- "${BASH_SOURCE[0]}")/comun.sh"
 
 command -v rsvg-convert >/dev/null \
     || err "Falta «rsvg-convert».\n\nInstálalo con:\n    sudo pacman -S librsvg"
@@ -24,22 +24,18 @@ case "$fmt" in
     *) err "Formato de SVG desconocido: $fmt" ;;
 esac
 
-errf=$(mktemp)
-trap 'rm -f "$errf"' EXIT
-hechos=0
+validar_archivos "$@"
+iniciar_temporales
 for f in "$@"; do
-    [[ -f "$f" ]] || continue
-    [[ "$f" == -* ]] && f="./$f"        # no confundir un nombre «-algo» con una opción
-    d=$(dirname -- "$f"); s=$(basename -- "$f"); s="${s%.*}"
-    out="$d/$s.$ext"; n=2
-    while [[ -e "$out" ]]; do out="$d/$s-$n.$ext"; n=$((n + 1)); done
+    ruta_archivo "$f"
+    nuevo_temporal "$d"
+    out="$trabajo/salida.$ext"
     if ! rsvg-convert -f "$fmt" -o "$out" "$f" 2>"$errf"; then
-        rm -f "$out"
         err "No se pudo convertir «$(basename -- "$f")»:\n$(tail -2 "$errf" 2>/dev/null || echo 'error desconocido')"
     fi
+    publicar "$out" "$d/$s" ".$ext"
     hechos=$((hechos + 1))
 done
 
-(( hechos > 0 )) || err "No se seleccionó ningún SVG válido."
 ok "$hechos SVG convertido(s) a $fmt."
 exit 0

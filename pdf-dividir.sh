@@ -1,111 +1,79 @@
 #!/usr/bin/env bash
-#
-# pdf-dividir.sh — Divide un PDF en varios (service menu de Dolphin / KF6).
-#
-# Uso: pdf-dividir.sh <modo> archivo.pdf
-#   modo = paginas  -> cada página en su propio archivo
-#   modo = rango    -> pide un rango (ej. 3-7) y extrae solo esas páginas
-#   modo = bloques  -> pide N y parte en trozos de N páginas
-#
-# Salida: subcarpeta «<original>-dividido/» junto al original, con archivos
-#         <original>-1.pdf, <original>-2.pdf, …
-#
-# Errores: kdialog --error y aborta (limpiando la carpeta a medias).
-
-set -euo pipefail
-
+# Uso: pdf-dividir.sh <paginas|rango|bloques> archivo.pdf.
+set -Eeuo pipefail
 TITULO="Dividir PDF"
-err()    { kdialog --title "$TITULO" --error "$1"; exit 1; }
-ok()     { kdialog --title "$TITULO" --passivepopup "$1" 6 >/dev/null 2>&1 || true; }
-
-errf=$(mktemp)
-trap 'rm -f "$errf"' EXIT
-
+# shellcheck source=comun.sh
+source "$(dirname -- "${BASH_SOURCE[0]}")/comun.sh"
 (( $# == 2 )) || err "Uso interno incorrecto del script de división."
 modo="$1"
-file="$2"
-
-[[ -f "$file" ]] || err "El archivo no existe:\n$file"
-[[ "$file" == -* ]] && file="./$file"   # no confundir un nombre «-algo» con una opción
-
-dir=$(dirname -- "$file")
-stem=$(basename -- "$file" .pdf)
-
-# Nº total de páginas (poppler).
-total=$(pdfinfo "$file" 2>/dev/null | awk '/^Pages:/ {print $2}') || true
-[[ "$total" =~ ^[0-9]+$ ]] || err "No se pudo leer el PDF (¿está dañado o cifrado?):\n$stem.pdf"
-
-# Carpeta de salida sin colisiones.
-outdir="$dir/$stem-dividido"
-n=2
-while [[ -e "$outdir" ]]; do outdir="$dir/$stem-dividido-$n"; n=$((n + 1)); done
-mkdir -p "$outdir"
-
-fail()   { rm -rf "$outdir"; err "$1"; }   # limpia la carpeta a medias
-cancel() { rm -rf "$outdir"; exit 0; }     # el usuario canceló: sin error
-
-# Recompone las páginas ini..fin (extraídas como tmp-pgN.pdf) en $1, y limpia.
-unir_rango() {
-    local destino="$1" ini="$2" fin="$3" p partes=()
-    for ((p = ini; p <= fin; p++)); do partes+=("$outdir/tmp-pg$p.pdf"); done
-    pdfunite "${partes[@]}" "$destino" 2>/dev/null || fail "No se pudo componer el resultado."
-    rm -f "${partes[@]}"
-}
-
+validar_archivos "$2"
+ruta_archivo "$2"; file="$f"; dir="$d"; stem="$s"
+iniciar_temporales
+total=$(LC_ALL=C pdfinfo "$file" 2>/dev/null | awk '/^Pages:/ {print $2}') || true
+[[ "$total" =~ ^[1-9][0-9]*$ ]] || err "No se pudo leer el PDF (¿dañado o cifrado?):\n${file##*/}"
 case "$modo" in
-    paginas)
-        # pdfseparate nombra cada archivo con el número de página (1..total).
-        if ! pdfseparate "$file" "$outdir/$stem-%d.pdf" 2>"$errf"; then
-            fail "No se pudo dividir el PDF:\n$(cat "$errf" 2>/dev/null || echo 'error desconocido')"
-        fi
-        ok "$total archivos creados en:\n$(basename -- "$outdir")/"
-        ;;
-
+    paginas) ;;
     rango)
-        r=$(kdialog --title "$TITULO" \
-            --inputbox "Páginas a extraer (de 1 a $total).\nEjemplos: 3-7  o  5" "") || cancel
+        r=$(kdialog --title "$TITULO" --inputbox "Páginas a extraer (1-$total).\nEjemplos: 3-7 o 5" "") || cancelar
         r="${r//[[:space:]]/}"
         if [[ "$r" =~ ^([0-9]+)-([0-9]+)$ ]]; then
-            ini=${BASH_REMATCH[1]}; fin=${BASH_REMATCH[2]}
-        elif [[ "$r" =~ ^([0-9]+)$ ]]; then
-            ini=$r; fin=$r
+            inicio="${BASH_REMATCH[1]}"; final="${BASH_REMATCH[2]}"
+        elif [[ "$r" =~ ^[0-9]+$ ]]; then
+            inicio="$r"; final="$r"
         else
-            fail "Rango no válido: «$r».\nUsa formato 3-7 o un solo número."
+            err "Rango no válido: «$r».\nUsa 3-7 o un solo número."
         fi
-        (( ini >= 1 && fin <= total && ini <= fin )) \
-            || fail "Rango fuera de los límites (1-$total): $ini-$fin"
-        out="$outdir/$stem-${ini}_a_${fin}.pdf"
-        if ! pdfseparate -f "$ini" -l "$fin" "$file" "$outdir/tmp-pg%d.pdf" 2>"$errf"; then
-            fail "No se pudo extraer el rango:\n$(cat "$errf" 2>/dev/null || echo 'error desconocido')"
-        fi
-        unir_rango "$out" "$ini" "$fin"
-        ok "Páginas $ini-$fin extraídas en:\n$(basename -- "$outdir")/"
+        numero_decimal "$inicio" "$total" || err "Página inicial fuera de los límites (1-$total): $inicio"
+        ini="$numero"
+        numero_decimal "$final" "$total" || err "Página final fuera de los límites (1-$total): $final"
+        fin="$numero"
+        (( ini <= fin )) || err "La página inicial no puede ser posterior a la final."
         ;;
-
     bloques)
-        nstr=$(kdialog --title "$TITULO" \
-            --inputbox "Número de páginas por bloque (1 a $total):" "") || cancel
+        nstr=$(kdialog --title "$TITULO" --inputbox "Número de páginas por bloque (1-$total):" "") || cancelar
         nstr="${nstr//[[:space:]]/}"
-        if ! [[ "$nstr" =~ ^[0-9]+$ ]] || (( nstr < 1 || nstr > total )); then
-            fail "Número de páginas por bloque no válido: «$nstr»."
-        fi
+        numero_decimal "$nstr" "$total" || err "Número de páginas por bloque no válido: «$nstr»."
+        bloque="$numero"
+        ;;
+    *) err "Modo de división desconocido: $modo" ;;
+esac
+nuevo_temporal "$dir"
+outdir="$trabajo/documentos"
+mkdir -- "$outdir"
+# pdfseparate interpreta el patrón COMPLETO como printf, incluida la carpeta.
+patron="$outdir/tmp-pg"; patron="${patron//%/%%}%d.pdf"
+extraer() {
+    pdfseparate -f "$1" -l "$2" "$file" "$patron" 2>"$errf" \
+        || err "No se pudo dividir el PDF:\n$(tail -3 "$errf")"
+}
+unir_rango() {
+    local destino="$1" inicio="$2" final="$3" pagina partes=()
+    for ((pagina = inicio; pagina <= final; pagina++)); do partes+=("$outdir/tmp-pg$pagina.pdf"); done
+    pdfunite "${partes[@]}" "$destino" 2>"$errf" \
+        || err "No se pudo componer el resultado:\n$(tail -3 "$errf")"
+    rm -f -- "${partes[@]}"
+}
+case "$modo" in
+    paginas)
+        extraer 1 "$total"
+        for ((p = 1; p <= total; p++)); do mv -- "$outdir/tmp-pg$p.pdf" "$outdir/$stem-$p.pdf"; done
+        cantidad="$total"
+        ;;
+    rango)
+        extraer "$ini" "$fin"
+        unir_rango "$outdir/$stem-${ini}_a_${fin}.pdf" "$ini" "$fin"
+        cantidad=1
+        ;;
+    bloques)
         parte=1
-        ini=1
-        while (( ini <= total )); do
-            fin=$(( ini + nstr - 1 ))
-            (( fin > total )) && fin=$total
-            pdfseparate -f "$ini" -l "$fin" "$file" "$outdir/tmp-pg%d.pdf" 2>/dev/null \
-                || fail "Fallo al generar el bloque $parte."
+        for ((ini = 1; ini <= total; ini += bloque)); do
+            fin=$((ini + bloque - 1)); (( fin <= total )) || fin="$total"
+            extraer "$ini" "$fin"
             unir_rango "$outdir/$stem-$parte.pdf" "$ini" "$fin"
             parte=$((parte + 1))
-            ini=$(( fin + 1 ))
         done
-        ok "$((parte - 1)) bloques creados en:\n$(basename -- "$outdir")/"
-        ;;
-
-    *)
-        fail "Modo de división desconocido: $modo"
+        cantidad=$((parte - 1))
         ;;
 esac
-
-exit 0
+publicar "$outdir" "$dir/$stem-dividido"
+ok "$cantidad archivo(s) creado(s) en:\n${resultado##*/}/"

@@ -1,110 +1,156 @@
 # conversor-dolphin
 
-Menú contextual de **Dolphin** (KDE Plasma 6 / KF6) para **gestionar** y **convertir**
-archivos: PDF, imágenes, audio, vídeo y documentos de oficina. Scripts de shell ligeros
-sobre poppler, ghostscript, img2pdf, ImageMagick, ffmpeg, LibreOffice y ocrmypdf, con `kdialog`.
+Menús contextuales para **Dolphin / KDE Frameworks 6** que convierten archivos
+locales con herramientas del sistema y diálogos de `kdialog`.
 
-## Acciones
+| Selección | Operaciones |
+| --- | --- |
+| Un PDF | Dividir por páginas, rango o bloques; PNG/JPG a 150/300 ppp; texto; compresión; OCR en español |
+| Dos o más PDF | Unir, reordenar y excluir documentos antes de confirmar |
+| Imágenes | PDF combinado; JPG, PNG, WebP, AVIF y TIFF |
+| SVG / SVGZ | PNG al tamaño original o PDF vectorial |
+| Audio | MP3, FLAC, WAV, OGG Vorbis, Opus y M4A AAC |
+| Vídeo | MP4 H.264, MP4 720p/1080p, WebM VP9, GIF animado, extraer MP3 y comprimir |
+| Libros electrónicos | PDF mediante Calibre |
+| Documentos de oficina | PDF mediante LibreOffice |
 
-Distintos submenús de clic derecho según el tipo de archivo (menús bilingües ES/EN):
+Los nombres del menú están disponibles en español e inglés. Los diálogos están
+en español. Las acciones solo aparecen sobre archivos locales del tipo apropiado;
+no se ofrecen sobre URLs remotas de KIO. Un recurso montado como sistema de
+archivos local se trata como cualquier otra carpeta.
 
-### «Acciones PDF»
-- **Sobre un PDF:** dividir (cada página · rango `3-7` · bloques de N) · convertir a
-  imágenes (PNG/JPG, 150/300 ppp) · a texto · comprimir · **OCR** (texto buscable).
-- **Sobre 2 o más PDF:** unir (con diálogo para reordenar; 2 → `a_b.pdf`, 3+ → `a_y_otros.pdf`).
+## Resultados y límites
 
-### «Convertir imagen»
-Sobre imágenes (JPG/PNG/WebP/AVIF/TIFF/BMP/GIF/**HEIC**): a PDF (une varias sin pérdida)
-o a otro formato (JPG/PNG/WebP/AVIF/TIFF).
-
-### «Convertir SVG»
-Sobre archivos `.svg`: a PNG (rasterizado) o a PDF (vectorial, sin pérdida).
-
-### «Convertir audio»
-Sobre audio: a MP3 / FLAC / WAV / OGG / Opus / M4A.
-
-### «Convertir vídeo»
-Sobre vídeo: a MP4 (H.264) · a MP4 1080p · a MP4 720p (reescalan sin agrandar) ·
-WebM (VP9) · GIF animado · extraer audio (MP3) · comprimir.
-
-### «Convertir libro»
-Sobre libros electrónicos (EPUB, MOBI, AZW, AZW3, FB2): a PDF (Calibre).
-
-### «Convertir documento»
-Sobre documentos de oficina (docx, odt, xlsx, pptx, rtf…): a PDF (LibreOffice).
-
-Convenciones: cada resultado se deja junto al original sin sobrescribir (añade `-2`,
-`-3`…); las divisiones y las imágenes de un PDF van a una subcarpeta. Aviso pasivo al
-terminar; diálogo de error (y limpieza de lo dejado a medias) si algo falla.
+- Cada resultado queda junto al original. Si el nombre está ocupado, se añade
+  `-2`, `-3`… También se respetan carpetas y enlaces simbólicos existentes.
+  Las ejecuciones simultáneas publican resultados sin reemplazarse entre sí.
+- Las páginas divididas y las imágenes de un PDF se agrupan en una subcarpeta.
+  Se admiten espacios, porcentajes, saltos de línea y nombres que empiezan por `-`.
+- La conversión se realiza en temporales privados. Solo se publica el resultado
+  terminado; se limpian los temporales al cancelar, fallar o recibir SIGINT/SIGTERM.
+  Un cierre forzoso (SIGKILL) o un apagado puede dejar carpetas ocultas
+  `.conversor-dolphin.*`; no se eliminan automáticamente temporales de otra ejecución.
+- En un lote, los resultados ya completados se conservan si falla un archivo
+  posterior. El diálogo de error indica cuántos se completaron. Una entrada
+  inexistente o ilegible se detecta antes de iniciar la conversión.
+- **Imágenes a PDF:** orden natural por ruta (`foto1`, `foto2`, `foto10`). JPEG
+  se incrusta sin recodificar. Si `img2pdf` no entiende un formato, se utiliza
+  ImageMagick para decodificarlo a PNG; por ejemplo, HEIC/HEIF. No se añade
+  compresión con pérdida, aunque el PDF puede ser grande. Se conservan las
+  páginas/fotogramas que la herramienta decodifique.
+- **Imagen a otro formato:** solo se utiliza el primer fotograma/página. Si hay
+  varios, se pide confirmación. Esta acción no conserva animaciones. JPG compone
+  la transparencia sobre blanco; JPG, WebP y AVIF usan compresión con pérdida.
+- **MP4:** H.264 con color `yuv420p` y dimensiones pares. 720p/1080p limitan la
+  altura sin agrandarla; el perfil general puede añadir un píxel de borde para
+  admitir dimensiones impares. No se garantiza compatibilidad con todos los equipos.
+- **Comprimir PDF/vídeo:** solo se guarda la copia si ocupa menos que el original.
+  La recodificación puede perder calidad y no garantiza conservar todos los
+  metadatos, pistas o características del documento.
+- Calibre no elimina DRM. LibreOffice depende de las fuentes disponibles para
+  reproducir la maquetación. OCR utiliza español y omite páginas que ya tienen texto.
+- Las tareas pesadas se ejecutan fuera del proceso de Dolphin. Hay avisos al
+  empezar vídeo/libros y al terminar, pero aún no hay progreso ni cancelación
+  durante la conversión. Los conversores no aíslan las herramientas externas.
 
 ## Dependencias
 
-**Obligatorias:** `poppler` y `kdialog`.
+**Obligatorias:** Bash, utilidades GNU habituales de Linux, `poppler` y `kdialog`.
+En Arch, Bash/coreutils forman parte del sistema base.
 
-**Opcionales** (cada función avisa con el comando exacto si le falta su herramienta):
-`ghostscript` (comprimir PDF), `img2pdf` (imágenes→PDF), `imagemagick` (convertir imágenes),
-`ffmpeg` (audio y vídeo), `librsvg` (SVG→PNG/PDF), `calibre` (libros→PDF),
-`libreoffice-still` (oficina→PDF), `ocrmypdf` + `tesseract-data-spa`
-(OCR). Casi todas en los repos oficiales de Arch; **`ocrmypdf` está en AUR**
-(`yay -S ocrmypdf`).
+| Función | Paquetes opcionales en Arch |
+| --- | --- |
+| Comprimir PDF | `ghostscript` |
+| Imágenes a PDF | `img2pdf` |
+| Convertir imágenes; alternativa para HEIC/HEIF a PDF | `imagemagick`; `libheif` para HEIC/HEIF y AVIF |
+| Audio y vídeo | `ffmpeg` |
+| SVG | `librsvg` |
+| Libros | `calibre` |
+| Oficina | `libreoffice-still` o `libreoffice-fresh` |
+| OCR | `ocrmypdf` (AUR), `tesseract-data-spa` |
 
-> Para **HEIC/HEIF** (fotos de móvil) y para **escribir AVIF**, ImageMagick necesita
-> además el delegado `libheif` (`sudo pacman -S libheif`).
+Cada acción informa de la herramienta que falta. En otras distribuciones hay
+que adaptar el nombre del paquete y el gestor indicado en el diálogo.
 
 ## Instalación
 
-### Desde AUR  *(recomendado en Arch / EndeavourOS)*
+En Arch / EndeavourOS, la última **versión publicada** está en AUR:
 
 ```bash
-yay -S conversor-dolphin      # o: paru -S conversor-dolphin
+yay -S conversor-dolphin
 ```
 
-### Compilando el paquete aquí mismo (makepkg)
+Para instalar el **código de este directorio** manteniendo una instalación
+gestionada por pacman:
 
 ```bash
-makepkg -si        # construye e instala con pacman
-kbuildsycoca6      # refresca la caché de menús de KDE
+python3 -B tests/paquete_local.py --output-dir tests/.tmp/paquetes-locales
 ```
 
-### Manual, sin paquete *(cualquier distro con KF6)*
+El comando construye, verifica y conserva el paquete; muestra su ruta exacta.
+Instala ese archivo con `sudo pacman -U` y después ejecuta `kbuildsycoca6`.
+No reemplaza un paquete que ya exista en la carpeta de salida. El paquete local
+conserva el número de versión del PKGBUILD vigente, aunque incluye los cambios
+de desarrollo. No equivale a publicar una versión nueva en AUR.
+
+Para una instalación **manual, sin pacman**:
 
 ```bash
+make check
 sudo make install
 kbuildsycoca6
 ```
 
-Tras instalar, **reinicia Dolphin** (cierra todas sus ventanas) si estaba abierto.
+Cierra todas las ventanas de Dolphin y vuelve a abrirlo si no actualiza los menús.
+`make install` admite `PREFIX` (por defecto `/usr`) y `DESTDIR` para instalaciones
+en una raíz temporal. Las rutas `Exec` se ajustan al prefijo, sin incluir `DESTDIR`.
 
-### ⚠️ Si ya lo tenías instalado «a mano» (versiones anteriores)
-
-Las versiones antiguas se copiaban con un `instalar.sh` a otras rutas. Para que
-no aparezcan **menús duplicados**, elimina una sola vez los ficheros antiguos:
-
-```bash
-sudo rm -f /usr/share/kio/servicemenus/pdf-unir.desktop \
-           /usr/share/kio/servicemenus/pdf-dividir.desktop \
-           /usr/share/kio/servicemenus/scripts/pdf-unir.sh \
-           /usr/share/kio/servicemenus/scripts/pdf-dividir.sh
-sudo rmdir /usr/share/kio/servicemenus/scripts 2>/dev/null
-kbuildsycoca6
-```
-
-## Desinstalar
+`makepkg -si` utiliza el tarball de la etiqueta publicada que indica `PKGBUILD`,
+**no los cambios locales**. Para comprobar el árbol actual sin instalarlo:
 
 ```bash
-sudo pacman -R conversor-dolphin     # si se instaló como paquete
-sudo make uninstall                   # si se instaló con «make install»
+make test-package
 ```
 
-## Estructura
+Las correcciones de la sección «Sin publicar» del CHANGELOG estarán disponibles
+en AUR después de publicar una nueva versión. El empaquetado publicado se mantiene
+intacto hasta disponer de la etiqueta y su suma de comprobación.
 
+Si quedan menús de instalaciones antiguas, localiza `pdf-unir.desktop` y
+`pdf-dividir.desktop` en `/usr/share/kio/servicemenus/` y retira únicamente esos
+archivos y sus scripts antiguos. No borres la carpeta de menús ni archivos de
+otros paquetes.
+
+## Desinstalación
+
+```bash
+sudo pacman -R conversor-dolphin       # instalación como paquete
+sudo make uninstall                  # instalación manual, mismo PREFIX
 ```
-*.sh                                  → lógica de cada conversión (en /usr/share/conversor-dolphin/)
-conversor-dolphin-*.desktop           → service menus (en /usr/share/kio/servicemenus/)
-Makefile                              → install / uninstall (DESTDIR + PREFIX)
-PKGBUILD + .SRCINFO + *.install       → empaquetado para AUR
+
+Después ejecuta `kbuildsycoca6`. La desinstalación manual conserva archivos ajenos
+al proyecto y no elimina las conversiones realizadas.
+
+## Desarrollo
+
+```bash
+make check             # sintaxis Bash y ShellCheck
+make test              # pruebas de comportamiento y conversores disponibles
+make test-integration  # incluye LibreOffice, Calibre y OCR
+make test-package      # construir e inspeccionar un paquete local en Arch
+make test-kde          # opcional: verificar los menús ya instalados con KIO
 ```
 
-## Licencia
+`test-kde` requiere CMake, un compilador C++ y los archivos de desarrollo de
+Qt 6 Widgets y KF6 KIO. Comprueba iconos y filtros mediante la API nativa,
+sin abrir ventanas ni ejecutar acciones. No son dependencias de la aplicación.
 
-MIT — ver [LICENSE](LICENSE).
+Consulta [TESTING.md](TESTING.md) para cobertura y comprobaciones manuales,
+[ROADMAP.md](ROADMAP.md) para trabajo pendiente, [PACKAGING.md](PACKAGING.md) para
+publicar y [CHANGELOG.md](CHANGELOG.md) para el historial.
+
+Los diez conversores cargan `comun.sh`, que gestiona diálogos, validación,
+temporales y publicación. Los ocho `.desktop` definen las acciones por MIME.
+`Makefile` centraliza la instalación y `PKGBUILD` la utiliza para AUR.
+
+MIT — [LICENSE](LICENSE).

@@ -4,3 +4,5 @@
 *.pkg.tar.*
 *.log
 /conversor-dolphin-*.tar.gz
+/tests/.tmp/
+__pycache__/

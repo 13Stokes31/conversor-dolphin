@@ -12,11 +12,11 @@
 #   comprimir  -> MP4 más pequeño (H.264 CRF 28)
 # Resultado junto al original, sin sobrescribir. Los vídeos pueden tardar.
 
-set -euo pipefail
+set -Eeuo pipefail
 
 TITULO="Convertir vídeo"
-err() { kdialog --title "$TITULO" --error "$1"; exit 1; }
-ok()  { kdialog --title "$TITULO" --passivepopup "$1" 6 >/dev/null 2>&1 || true; }
+# shellcheck source=comun.sh
+source "$(dirname -- "${BASH_SOURCE[0]}")/comun.sh"
 
 command -v ffmpeg >/dev/null \
     || err "Falta «ffmpeg».\n\nInstálalo con:\n    sudo pacman -S ffmpeg"
@@ -25,32 +25,34 @@ command -v ffmpeg >/dev/null \
 modo="$1"; shift
 sufijo=""
 case "$modo" in
-    mp4)       ext=mp4;  opts=(-c:v libx264 -crf 23 -preset medium -c:a aac -b:a 192k -movflags +faststart) ;;
-    mp4-1080)  ext=mp4;  sufijo="-1080p"; opts=(-vf "scale=-2:'min(1080,ih)'" -c:v libx264 -crf 23 -preset medium -c:a aac -b:a 192k -movflags +faststart) ;;
-    mp4-720)   ext=mp4;  sufijo="-720p";  opts=(-vf "scale=-2:'min(720,ih)'"  -c:v libx264 -crf 23 -preset medium -c:a aac -b:a 160k -movflags +faststart) ;;
+    mp4)       ext=mp4;  opts=(-vf "pad=ceil(iw/2)*2:ceil(ih/2)*2" -pix_fmt yuv420p -c:v libx264 -crf 23 -preset medium -c:a aac -b:a 192k -movflags +faststart) ;;
+    mp4-1080)  ext=mp4;  sufijo="-1080p"; opts=(-vf "scale=-2:'trunc(min(1080,ih)/2)*2'" -pix_fmt yuv420p -c:v libx264 -crf 23 -preset medium -c:a aac -b:a 192k -movflags +faststart) ;;
+    mp4-720)   ext=mp4;  sufijo="-720p";  opts=(-vf "scale=-2:'trunc(min(720,ih)/2)*2'"  -pix_fmt yuv420p -c:v libx264 -crf 23 -preset medium -c:a aac -b:a 160k -movflags +faststart) ;;
     webm)      ext=webm; opts=(-c:v libvpx-vp9 -crf 32 -b:v 0 -c:a libopus) ;;
     gif)       ext=gif;  opts=(-vf "fps=12,scale=480:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse") ;;
     audio)     ext=mp3;  opts=(-vn -codec:a libmp3lame -q:a 2) ;;
-    comprimir) ext=mp4;  sufijo="-comprimido"; opts=(-c:v libx264 -crf 28 -preset medium -c:a aac -b:a 128k -movflags +faststart) ;;
+    comprimir) ext=mp4;  sufijo="-comprimido"; opts=(-vf "pad=ceil(iw/2)*2:ceil(ih/2)*2" -pix_fmt yuv420p -c:v libx264 -crf 28 -preset medium -c:a aac -b:a 128k -movflags +faststart) ;;
     *) err "Modo de vídeo desconocido: $modo" ;;
 esac
 
-errf=$(mktemp)
-trap 'rm -f "$errf"' EXIT
+validar_archivos "$@"
+iniciar_temporales
 ok "Procesando vídeo… esto puede tardar un rato."
-hechos=0
 for f in "$@"; do
-    [[ -f "$f" ]] || continue
-    d=$(dirname -- "$f"); s=$(basename -- "$f"); s="${s%.*}"
-    out="$d/$s$sufijo.$ext"; n=2
-    while [[ -e "$out" ]]; do out="$d/$s$sufijo-$n.$ext"; n=$((n + 1)); done
+    ruta_archivo "$f"
+    nuevo_temporal "$d"
+    out="$trabajo/salida.$ext"
     if ! ffmpeg -nostdin -loglevel error -i "$f" "${opts[@]}" "$out" 2>"$errf"; then
-        rm -f "$out"
         err "No se pudo procesar «$(basename -- "$f")»:\n$(tail -3 "$errf" 2>/dev/null || echo 'error desconocido')"
     fi
+    if [[ "$modo" == comprimir ]] && (( $(stat -c%s -- "$out") >= $(stat -c%s -- "$f") )); then
+        ok "«${f##*/}»: la recodificación no reduce el tamaño; no se guardó ninguna copia."
+        continue
+    fi
+    publicar "$out" "$d/$s$sufijo" ".$ext"
     hechos=$((hechos + 1))
 done
 
-(( hechos > 0 )) || err "No se seleccionó ningún vídeo válido."
+(( hechos > 0 )) || exit 0
 ok "$hechos vídeo(s) procesado(s) ($modo)."
 exit 0

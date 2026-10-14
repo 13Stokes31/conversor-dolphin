@@ -7,34 +7,30 @@
 # Usa «ebook-convert» de Calibre. Resultado junto al original, sin sobrescribir.
 # Los libros grandes pueden tardar.
 
-set -euo pipefail
+set -Eeuo pipefail
 
 TITULO="Convertir libro a PDF"
-err() { kdialog --title "$TITULO" --error "$1"; exit 1; }
-ok()  { kdialog --title "$TITULO" --passivepopup "$1" 6 >/dev/null 2>&1 || true; }
+# shellcheck source=comun.sh
+source "$(dirname -- "${BASH_SOURCE[0]}")/comun.sh"
 
 command -v ebook-convert >/dev/null \
     || err "Falta «ebook-convert» (Calibre).\n\nInstálalo con:\n    sudo pacman -S calibre"
 
 (( $# >= 1 )) || err "Selecciona al menos un libro electrónico."
 
-errf=$(mktemp)
-trap 'rm -f "$errf"' EXIT
+validar_archivos "$@"
+iniciar_temporales
 ok "Convirtiendo a PDF… los libros grandes pueden tardar."
-hechos=0
 for f in "$@"; do
-    [[ -f "$f" ]] || continue
-    [[ "$f" == -* ]] && f="./$f"        # no confundir un nombre «-algo» con una opción
-    d=$(dirname -- "$f"); s=$(basename -- "$f"); s="${s%.*}"
-    out="$d/$s.pdf"; n=2
-    while [[ -e "$out" ]]; do out="$d/$s-$n.pdf"; n=$((n + 1)); done
+    ruta_archivo "$f"
+    nuevo_temporal "$d"
+    out="$trabajo/salida.pdf"
     if ! ebook-convert "$f" "$out" >/dev/null 2>"$errf"; then
-        rm -f "$out"
         err "No se pudo convertir «$(basename -- "$f")»:\n$(tail -3 "$errf" 2>/dev/null || echo 'error desconocido')"
     fi
+    publicar "$out" "$d/$s" ".pdf"
     hechos=$((hechos + 1))
 done
 
-(( hechos > 0 )) || err "No se seleccionó ningún libro válido."
 ok "$hechos libro(s) convertido(s) a PDF."
 exit 0

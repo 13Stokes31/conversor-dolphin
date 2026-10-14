@@ -1,5 +1,6 @@
 [Desktop Entry]
 Type=Service
+X-KDE-Protocol=file
 X-KDE-Priority=TopLevel
 MimeType=image/svg+xml;image/svg+xml-compressed;
 Actions=svgToPng;svgToPdf

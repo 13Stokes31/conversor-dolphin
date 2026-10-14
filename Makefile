@@ -16,7 +16,7 @@ SCRIPTDIR  := $(SHAREDIR)/$(NAME)
 MENUDIR    := $(SHAREDIR)/kio/servicemenus
 LICENSEDIR := $(SHAREDIR)/licenses/$(NAME)
 
-SCRIPTS := pdf-unir.sh pdf-dividir.sh pdf-convertir.sh img-a-pdf.sh office-a-pdf.sh \
+SCRIPTS := comun.sh pdf-unir.sh pdf-dividir.sh pdf-convertir.sh img-a-pdf.sh office-a-pdf.sh \
            img-convertir.sh audio-convertir.sh video-convertir.sh svg-convertir.sh \
            ebook-a-pdf.sh
 MENUS   := conversor-dolphin-pdf.desktop conversor-dolphin-unir.desktop \
@@ -24,16 +24,39 @@ MENUS   := conversor-dolphin-pdf.desktop conversor-dolphin-unir.desktop \
            conversor-dolphin-audio.desktop conversor-dolphin-video.desktop \
            conversor-dolphin-svg.desktop conversor-dolphin-ebook.desktop
 
-.PHONY: install uninstall
+.PHONY: install uninstall check test test-integration test-package test-kde
 
 install:
-	install -d $(SCRIPTDIR) $(MENUDIR) $(LICENSEDIR)
-	install -m755 $(SCRIPTS) $(SCRIPTDIR)/
-	install -m644 $(MENUS) $(MENUDIR)/
-	install -m644 LICENSE $(LICENSEDIR)/
+	install -d "$(SCRIPTDIR)" "$(MENUDIR)" "$(LICENSEDIR)"
+	install -m755 $(SCRIPTS) "$(SCRIPTDIR)/"
+	@for menu in $(MENUS); do \
+		sed -E 's@^Exec=/usr/share/$(NAME)/([^ ]+)@Exec="$(PREFIX)/share/$(NAME)/\1"@' \
+			"$$menu" > "$(MENUDIR)/$$menu" || exit 1; \
+		chmod 644 "$(MENUDIR)/$$menu" || exit 1; \
+	done
+	install -m644 LICENSE "$(LICENSEDIR)/"
 
 uninstall:
-	rm -f $(addprefix $(SCRIPTDIR)/,$(SCRIPTS))
-	rm -f $(addprefix $(MENUDIR)/,$(MENUS))
-	rm -f $(LICENSEDIR)/LICENSE
-	rmdir $(SCRIPTDIR) $(LICENSEDIR) 2>/dev/null || true
+	@for script in $(SCRIPTS); do rm -f -- "$(SCRIPTDIR)/$$script" || exit 1; done
+	@for menu in $(MENUS); do rm -f -- "$(MENUDIR)/$$menu" || exit 1; done
+	rm -f -- "$(LICENSEDIR)/LICENSE"
+	rmdir -- "$(SCRIPTDIR)" "$(LICENSEDIR)" 2>/dev/null || true
+
+check:
+	@for script in $(SCRIPTS); do bash -n "$$script" || exit 1; done
+	shellcheck -x $(SCRIPTS)
+
+test:
+	python3 -B -m unittest discover -s tests -v
+
+test-integration:
+	CONVERSOR_TEST_INTEGRATION=1 python3 -B -m unittest discover -s tests -v
+
+test-package:
+	python3 -B tests/paquete_local.py
+
+# Opcional: requiere los menús instalados y los archivos de desarrollo de Qt/KF6.
+test-kde:
+	cmake -S tests/kde -B tests/.tmp/kde-build
+	cmake --build tests/.tmp/kde-build
+	QT_QPA_PLATFORM=offscreen tests/.tmp/kde-build/menu-probe
