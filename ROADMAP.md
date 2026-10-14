@@ -10,21 +10,22 @@ reemplazo; hay pruebas de concurrencia, cancelación, limpieza y conversión rea
 La propuesta inicial y el informe de auditoría se han retirado: el comportamiento
 vigente está en README, los cambios en CHANGELOG y la evidencia en TESTING.
 
-El código revisado está instalado en el equipo local desde el 14 de octubre
-mediante pacman. La comprobación nativa de KIO confirma el icono de imagen y
-los filtros de archivos y protocolos; la inspección visual en Dolphin sigue
-pendiente. La versión publicada en AUR continúa siendo la anterior.
+El código revisado se instaló y verificó en el equipo local mediante pacman.
+La comprobación nativa de KIO confirmó el icono de imagen y los filtros de
+archivos y protocolos. Después se retiró esa instalación y su dependencia
+automática sin uso para permitir una instalación normal desde AUR.
+La inspección visual en Dolphin sigue pendiente.
 
-## Preparación de 1.3.2-1
+## Versión 1.3.2-1 publicada
 
 La etiqueta de código `v1.3.2` está publicada en GitHub. La receta de AUR está
-preparada como `1.3.2-1`, utilizando su tarball descargado y una suma SHA256
+publicada como `1.3.2-1`, utilizando su tarball descargado y una suma SHA256
 verificada. El paquete se ha construido e inspeccionado con esa receta real.
 Solo se mantiene `conversor-dolphin`: no hay compilación que justifique una
-variante `-bin`. El clon de publicación se prepara en `aur/conversor-dolphin`,
-separado del historial principal e ignorado por Git.
+variante `-bin`. El clon de publicación está en `aur/conversor-dolphin`,
+sincronizado con AUR, separado del historial principal e ignorado por Git.
 
-## Antes de publicar en AUR
+## Para las siguientes versiones
 
 1. Completar la comprobación visual de Dolphin descrita en TESTING: icono del
    submenú, traducciones, filtros MIME, selección múltiple y ausencia de acciones
@@ -32,7 +33,7 @@ separado del historial principal e ignorado por Git.
 2. Revisar los cambios y ejecutar `make check`, `make test-integration` y
    `make test-package` en el entorno de publicación. Con los menús instalados y
    las herramientas de desarrollo de KDE disponibles, ejecutar `make test-kde`.
-3. Revisar el commit preparado en el clon de AUR y subirlo según PACKAGING.
+3. Preparar y revisar el commit del clon de AUR y subirlo según PACKAGING.
    Preparar una actualización local o publicar la etiqueta en GitHub no cambia
    la versión que sirve AUR.
 

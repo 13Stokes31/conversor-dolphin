@@ -106,14 +106,14 @@ No se desactivó la seguridad de estas aplicaciones ni se cambió su código par
 acomodar el entorno de pruebas.
 
 `namcap` no está instalado: se verificaron el contenido, propietario y metadatos
-del paquete con bsdtar. La comprobación manual de Dolphin sigue pendiente; también
-queda pendiente la publicación de una nueva versión en AUR.
+del paquete con bsdtar. La comprobación manual de Dolphin sigue pendiente.
+La publicación en AUR se completó posteriormente y se registra al final.
 
 ## Instalación local de 2026-10-14
 
 - Construido un paquete del árbol revisado con `--output-dir` y reinstalado
   mediante pacman. Se mantiene el identificador `1.3.1-2`, con el código local
-  actualizado; no se ha publicado una versión nueva en AUR.
+  actualizado; en ese momento aún no se había publicado la versión nueva en AUR.
 - Comparados los once scripts y la licencia con el repositorio; comprobados
   también los ocho menús, sus rutas Exec, permisos y propietario root.
 - `pacman -Qk conversor-dolphin`: 27 archivos registrados, ninguno ausente.
@@ -127,7 +127,7 @@ ventanas y vuelve a abrirlo. No se han cerrado automáticamente ventanas del usu
 
 ## Preparación de AUR 1.3.2-1 — 2026-10-14
 
-- La API pública de AUR devuelve únicamente `conversor-dolphin`, todavía en
+- Al preparar la actualización, la API de AUR devolvía únicamente `conversor-dolphin`, en
   `1.3.1-2`; no existe `conversor-dolphin-bin`. No hace falta esa variante para
   scripts y menús que no se compilan.
 - Etiqueta `v1.3.2` publicada en GitHub y tarball descargado desde la URL que
@@ -148,6 +148,23 @@ ventanas y vuelve a abrirlo. No se han cerrado automáticamente ventanas del usu
 
 No se han cambiado los conversores desde las 43 pruebas y las siete comprobaciones
 de KIO registradas anteriormente. Esta validación comprueba la versión y el
-empaquetado de las mismas fuentes. El clon `aur/conversor-dolphin` queda preparado
-en `master`, con solo los tres archivos de AUR; la publicación allí se realiza
-por separado. La inspección visual de Dolphin continúa pendiente.
+empaquetado de las mismas fuentes. El clon `aur/conversor-dolphin` se preparó
+en `master`, con solo los tres archivos de AUR, para publicarlo por separado.
+La inspección visual de Dolphin continúa pendiente.
+
+## Publicación y desinstalación — 2026-10-14
+
+- Commit `7745695` publicado en `master` del repositorio de AUR. Comprobada la
+  referencia remota y confirmada la versión `1.3.2-1` con la API pública.
+- La primera consulta de la API devolvió la versión anterior desde caché;
+  una consulta sin caché confirmó la actualización. El clon está sincronizado.
+- Desinstalación con `pacman -Rs`: retirados `conversor-dolphin` y `kdialog`.
+  Pacman conservó las dependencias compartidas o instaladas explícitamente.
+- Comprobado que ambos paquetes ya no están registrados y que se retiraron
+  los scripts, los ocho menús y la licencia de `/usr/share`.
+- Ejecutado `kbuildsycoca6` tras desinstalar. No se han borrado documentos
+  convertidos ni el repositorio del proyecto.
+
+El equipo queda sin el conversor, listo para instalar la versión publicada
+mediante `paru -S conversor-dolphin`. Esta fase no modifica el código del paquete;
+no requiere repetir las conversiones ya verificadas.
