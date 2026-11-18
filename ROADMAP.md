@@ -16,15 +16,12 @@ archivos y protocolos. Después se retiró esa instalación y su dependencia
 automática sin uso para permitir una instalación normal desde AUR.
 La inspección visual en Dolphin sigue pendiente.
 
-## Versión 1.3.2-1 publicada
+## Versión 1.4.0-1 publicada
 
-La etiqueta de código `v1.3.2` está publicada en GitHub. La receta de AUR está
-publicada como `1.3.2-1`, utilizando su tarball descargado y una suma SHA256
-verificada. El paquete se ha construido e inspeccionado con esa receta real.
-Solo se mantiene `conversor-dolphin`: no hay compilación que justifique una
-variante `-bin`. Los commits de desarrollo y empaquetado están guardados en
-GitHub y AUR. Los clones locales usados en la revisión no necesitan conservarse;
-se pueden recrear siguiendo README y PACKAGING para trabajar en otra versión.
+Los tres modos de división de PDF usan qpdf y LibreOffice procesa los documentos
+en lotes. La etiqueta `v1.4.0` está en GitHub y la receta `1.4.0-1` en AUR.
+El paquete se ha construido con el tarball publicado y una suma SHA256 verificada.
+Se mantiene un único paquete, `conversor-dolphin`.
 
 ## Para las siguientes versiones
 

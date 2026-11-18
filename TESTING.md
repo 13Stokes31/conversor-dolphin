@@ -96,6 +96,12 @@ traducciones o notificaciones. Esta comprobación queda pendiente antes de publi
   qpdf 12.4.2 y una copia temporal verificada de ImageMagick 7.1.2.33.
 - `make test-kde` verificó los menús instalados en un prefijo temporal mediante
   la API de KIO. El menú de PDF también apareció en una ventana aislada de Dolphin.
+- `makepkg` construyó `conversor-dolphin 1.4.0-1` desde la receta de AUR y el
+  tarball de GitHub. Se verificaron los veinte archivos, la dependencia de qpdf
+  y la división en bloques desde el script extraído del paquete.
+- La suma SHA256 del tarball de `v1.4.0` es
+  `c0f2444657a3bfaf6c1c58acf749540c56c2450077c8d15604c1aea8804f21ea`.
+- Receta publicada en `master` de AUR en el commit `021d118`.
 
 ## Resultado de la revisión de 2026-10-13
 

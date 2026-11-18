@@ -21,18 +21,15 @@ historial en `master`. Usa HTTPS para consultar AUR y SSH para publicar.
 Preparar y confirmar sus archivos no publica la actualización: el último paso
 es el push a AUR. Una vez sincronizado, el clon local puede retirarse.
 
-## Versión publicada: 1.3.2-1
+## Versión publicada 1.4.0-1
 
-La etiqueta `v1.3.2` ya está disponible en GitHub. El PKGBUILD de este repositorio
-y el publicado en AUR utilizan ese tarball con su SHA256 verificada; `.SRCINFO` está
-regenerado y el paquete se ha construido e inspeccionado correctamente.
-La actualización, con solo los tres archivos de empaquetado, está publicada
-en AUR mediante el commit `7745695`. La API pública confirma `1.3.2-1`.
-La evidencia y la suma completa están en TESTING.
+La etiqueta `v1.4.0` está disponible en GitHub. El PKGBUILD de `main` y el de
+AUR usan ese tarball con su SHA256 verificada. La receta publicada en AUR
+corresponde al commit `021d118`. La construcción, la comprobación del paquete
+y la suma completa están en TESTING.
 
-La instalación local de desarrollo se ha retirado junto con `kdialog`, la
-dependencia automática que quedó sin uso. Para instalar la versión publicada
-con el helper disponible en este equipo:
+Para instalar o actualizar la versión publicada con el helper disponible en
+este equipo:
 
 ```bash
 paru -S conversor-dolphin
