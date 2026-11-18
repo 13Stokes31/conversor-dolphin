@@ -5,14 +5,16 @@ TITULO="Dividir PDF"
 # shellcheck source=comun.sh
 source "$(dirname -- "${BASH_SOURCE[0]}")/comun.sh"
 (( $# == 2 )) || err "Uso interno incorrecto del script de división."
+need qpdf qpdf
 modo="$1"
 validar_archivos "$2"
 ruta_archivo "$2"; file="$f"; dir="$d"; stem="$s"
 iniciar_temporales
-total=$(LC_ALL=C pdfinfo "$file" 2>/dev/null | awk '/^Pages:/ {print $2}') || true
-[[ "$total" =~ ^[1-9][0-9]*$ ]] || err "No se pudo leer el PDF (¿dañado o cifrado?):\n${file##*/}"
+if ! total=$(qpdf --warning-exit-0 --show-npages "$file" 2>"$errf") || [[ ! "$total" =~ ^[1-9][0-9]*$ ]]; then
+    err "No se pudo leer el PDF (¿dañado o cifrado?):\n${file##*/}"
+fi
 case "$modo" in
-    paginas) ;;
+    paginas) bloque=1 ;;
     rango)
         r=$(kdialog --title "$TITULO" --inputbox "Páginas a extraer (1-$total).\nEjemplos: 3-7 o 5" "") || cancelar
         r="${r//[[:space:]]/}"
@@ -40,40 +42,30 @@ esac
 nuevo_temporal "$dir"
 outdir="$trabajo/documentos"
 mkdir -- "$outdir"
-# pdfseparate interpreta el patrón COMPLETO como printf, incluida la carpeta.
-patron="$outdir/tmp-pg"; patron="${patron//%/%%}%d.pdf"
-extraer() {
-    pdfseparate -f "$1" -l "$2" "$file" "$patron" 2>"$errf" \
-        || err "No se pudo dividir el PDF:\n$(tail -3 "$errf")"
-}
-unir_rango() {
-    local destino="$1" inicio="$2" final="$3" pagina partes=()
-    for ((pagina = inicio; pagina <= final; pagina++)); do partes+=("$outdir/tmp-pg$pagina.pdf"); done
-    pdfunite "${partes[@]}" "$destino" 2>"$errf" \
-        || err "No se pudo componer el resultado:\n$(tail -3 "$errf")"
-    rm -f -- "${partes[@]}"
-}
-case "$modo" in
-    paginas)
-        extraer 1 "$total"
-        for ((p = 1; p <= total; p++)); do mv -- "$outdir/tmp-pg$p.pdf" "$outdir/$stem-$p.pdf"; done
-        cantidad="$total"
-        ;;
-    rango)
-        extraer "$ini" "$fin"
-        unir_rango "$outdir/$stem-${ini}_a_${fin}.pdf" "$ini" "$fin"
-        cantidad=1
-        ;;
-    bloques)
-        parte=1
-        for ((ini = 1; ini <= total; ini += bloque)); do
-            fin=$((ini + bloque - 1)); (( fin <= total )) || fin="$total"
-            extraer "$ini" "$fin"
-            unir_rango "$outdir/$stem-$parte.pdf" "$ini" "$fin"
-            parte=$((parte + 1))
-        done
-        cantidad=$((parte - 1))
-        ;;
-esac
+# Copia el cifrado si lo hay. qpdf lo elimina por defecto al dividir.
+opciones=(--warning-exit-0 --copy-encryption="$file")
+if [[ "$modo" == rango ]]; then
+    salida="$outdir/$stem-${ini}_a_${fin}.pdf"
+    if ! qpdf "${opciones[@]}" --empty --pages "$file" "$ini-$fin" -- "$salida" 2>"$errf" \
+        || [[ ! -s "$salida" ]]; then
+        err "No se pudo extraer el rango:\n$(tail -3 "$errf")"
+    fi
+    cantidad=1
+else
+    # El patrón relativo evita que qpdf interprete un «%d» de la ruta original.
+    if ! (cd -- "$trabajo" && qpdf "${opciones[@]}" "$file" --split-pages="$bloque" 'parte-%d.pdf') 2>"$errf"; then
+        err "No se pudo dividir el PDF:\n$(tail -3 "$errf")"
+    fi
+    # qpdf rellena con ceros los números de página. La expansión los ordena.
+    shopt -s nullglob
+    unset GLOBSORT
+    partes=("$trabajo"/parte-*.pdf)
+    cantidad=$(( (total + bloque - 1) / bloque ))
+    (( ${#partes[@]} == cantidad )) || err "qpdf no generó todos los PDF esperados."
+    for i in "${!partes[@]}"; do
+        [[ -s "${partes[i]}" ]] || err "qpdf generó un PDF vacío."
+        mv -- "${partes[i]}" "$outdir/$stem-$((i + 1)).pdf"
+    done
+fi
 publicar "$outdir" "$dir/$stem-dividido"
 ok "$cantidad archivo(s) creado(s) en:\n${resultado##*/}/"

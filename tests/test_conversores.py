@@ -222,9 +222,9 @@ publicar "$trabajo/carpeta" "$PWD/resultado"
         self.assertEqual(list(existing.iterdir()), [])
         self.assertEqual({p.read_text() for p in self.work.glob("resultado-*/contenido")}, {str(i) for i in range(6)})
 
-    @requires("pdfinfo", "pdfseparate", "pdfunite")
+    @requires("qpdf", "pdfinfo")
     def test_split_pages_special_names(self):
-        folder = self.work / "100% con espacios\n"
+        folder = self.work / "100%d con espacios\n"
         folder.mkdir()
         pdf = folder / "-informe 100%\n.PDF"
         write_pdf(pdf, ["Uno", "Dos", "Tres"])
@@ -235,7 +235,7 @@ publicar "$trabajo/carpeta" "$PWD/resultado"
         self.assertTrue(all(self.pages(path) == 1 for path in outputs))
         self.assertEqual(hashlib.sha256(pdf.read_bytes()).digest(), before)
 
-    @requires("pdfinfo", "pdfseparate", "pdfunite")
+    @requires("qpdf", "pdfinfo", "pdftotext")
     def test_range_decimal_and_single_page(self):
         pdf = self.pdf()
         self.run_script("pdf-dividir.sh", "rango", pdf, answer="008-010")
@@ -247,12 +247,34 @@ publicar "$trabajo/carpeta" "$PWD/resultado"
         self.run_script("pdf-dividir.sh", "rango", pdf, answer="08")
         self.assertEqual(self.pages(self.work / "documento-dividido-2/documento-8_a_8.pdf"), 1)
 
-    @requires("pdfinfo", "pdfseparate", "pdfunite")
+    @requires("qpdf", "pdfinfo", "pdftotext")
     def test_blocks_decimal(self):
-        self.run_script("pdf-dividir.sh", "bloques", self.pdf(count=20), answer="010")
-        self.assertEqual([self.pages(path) for path in sorted((self.work / "documento-dividido").glob("*.pdf"))], [10, 10])
+        self.run_script("pdf-dividir.sh", "bloques", self.pdf(count=105), answer="010")
+        folder = self.work / "documento-dividido"
+        files = [folder / f"documento-{i}.pdf" for i in range(1, 12)]
+        self.assertEqual(set(folder.glob("*.pdf")), set(files))
+        self.assertEqual([self.pages(path) for path in files], [10] * 10 + [5])
+        for block, path in enumerate(files):
+            text = self.command("pdftotext", str(path), "-").stdout
+            expected = range(block * 10 + 1, min(block * 10 + 11, 106))
+            self.assertEqual(text.split(), [item for page in expected for item in ("Pagina", str(page))])
 
-    @requires("pdfinfo")
+    @requires("qpdf", "pdfinfo")
+    def test_split_preserves_pdf_encryption(self):
+        encrypted = self.work / "cifrado.pdf"
+        self.command("qpdf", "--encrypt", "", "propietario-prueba", "256", "--",
+                     str(self.pdf(count=3)), str(encrypted))
+        for folder, mode, answer in (("cifrado-dividido", "paginas", None),
+                                     ("cifrado-dividido-2", "rango", "2-3"),
+                                     ("cifrado-dividido-3", "bloques", "2")):
+            with self.subTest(mode=mode):
+                self.run_script("pdf-dividir.sh", mode, encrypted, answer=answer)
+                outputs = list((self.work / folder).glob("*.pdf"))
+                self.assertTrue(outputs)
+                for output in outputs:
+                    self.assertRegex(self.command("pdfinfo", str(output)).stdout, r"Encrypted:\s+yes")
+
+    @requires("qpdf")
     def test_invalid_numbers_and_ranges(self):
         pdf = self.pdf()
         for mode, answer in (("rango", "0"), ("rango", "5-3"), ("rango", "13"), ("rango", "a"),
@@ -261,16 +283,26 @@ publicar "$trabajo/carpeta" "$PWD/resultado"
                 self.run_script("pdf-dividir.sh", mode, pdf, answer=answer, success=False)
                 self.assertFalse(list(self.work.glob("*-dividido*")))
 
-    @requires("pdfinfo")
+    @requires("qpdf")
     def test_cancel_split_leaves_no_output(self):
         self.run_script("pdf-dividir.sh", "rango", self.pdf(), cancel=True)
         self.assertFalse(list(self.work.glob("*-dividido*")))
 
-    @requires("pdfinfo")
     def test_split_failure_cleans_partial_output(self):
-        self.stub("pdfseparate", '#!/usr/bin/env bash\npattern="${@: -1}"\nprintf -v output "$pattern" 1\nprintf partial > "$output"\nexit 1\n')
-        self.run_script("pdf-dividir.sh", "paginas", self.pdf(), success=False)
-        self.assertFalse(list(self.work.glob("*-dividido*")))
+        self.stub("qpdf", '''#!/usr/bin/env bash
+if [[ "$2" == --show-npages ]]; then
+    printf '12\\n'
+    exit 0
+fi
+printf partial > parte-01.pdf
+exit "$QPDF_STATUS"
+''')
+        pdf = self.pdf()
+        for status in ("2", "0"):
+            with self.subTest(status=status):
+                self.env["QPDF_STATUS"] = status
+                self.run_script("pdf-dividir.sh", "paginas", pdf, success=False)
+                self.assertFalse(list(self.work.glob("*-dividido*")))
 
     @requires("pdfunite", "pdfinfo", "pdftotext")
     def test_merge_reorder_and_exclusion(self):

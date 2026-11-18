@@ -65,7 +65,7 @@ def main():
                 if "X-KDE-Protocol=file" not in content or 'Exec="/usr/share/conversor-dolphin/' not in content:
                     raise RuntimeError(f"Menú instalado incorrecto: {name}")
         metadata = subprocess.check_output(["bsdtar", "-xOf", str(package), ".PKGINFO"], text=True)
-        if "depend = poppler" not in metadata or "depend = kdialog" not in metadata:
+        if any(f"depend = {name}\n" not in metadata for name in ("poppler", "qpdf", "kdialog")):
             raise RuntimeError("Dependencias obligatorias incorrectas")
         if shutil.which("namcap"):
             subprocess.run(["namcap", str(package)], cwd=work, env=env, check=True)

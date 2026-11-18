@@ -40,6 +40,10 @@ se pueden recrear siguiendo README y PACKAGING para trabajar en otra versión.
 
 ## Mejoras posteriores, si el uso las justifica
 
+- Volver a evaluar ArtCraft a partir de febrero de 2027. Comparar WordCraft y
+  DeckCraft con LibreOffice en documentos reales, con especial atención a la
+  paginación, tablas, notas al pie, gráficos y diapositivas maestras. Considerar
+  una integración si se conservan esos elementos en las versiones probadas.
 - Progreso y cancelación durante vídeo, Calibre y OCR. Debe poder interrumpirse
   la herramienta hija y limpiarse la salida incompleta, conservando resultados
   anteriores del lote.

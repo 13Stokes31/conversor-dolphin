@@ -3,12 +3,14 @@
 Todas las novedades relevantes de este proyecto se documentan aquí.
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/).
 
-## [Sin publicar]
+## [1.4.0] — 2026-11-18
 
 ### Mejorado
 - Los documentos de una carpeta con nombres base distintos se convierten a PDF
   en una llamada a LibreOffice. Ante un fallo del lote, se reintenta en orden
   para conservar las conversiones anteriores al documento que falla.
+- qpdf divide PDF por páginas, rangos y bloques directamente. Conserva los
+  nombres de salida y el cifrado de los PDF que se pueden abrir.
 
 ## [1.3.2] — 2026-10-14
 

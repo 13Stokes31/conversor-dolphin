@@ -49,7 +49,7 @@ haya pruebas en marcha. Ninguna prueba toca la instalación de `/usr`.
 | Publicación | Doce archivos y seis carpetas concurrentes; sufijos; destinos existentes y enlaces simbólicos rotos |
 | Limpieza | Fallos con salidas parciales de PDF y libros; cancelación; SIGTERM; ausencia de temporales |
 | Entradas | Nombres con espacios, porcentajes (incluido `%d`), corchetes, saltos de línea, extensión mayúscula y guion inicial; archivos ausentes, dañados y directorios sin permiso de escritura |
-| PDF | Páginas, rango, página única, bloques, ceros iniciales, límites y desbordamiento; unión reordenada con exclusión; duplicados; texto; cuatro perfiles de imágenes; compresión útil e inútil |
+| PDF | Páginas, rango, página única y bloques con qpdf; orden de más de diez bloques y último bloque parcial; cifrado; limpieza si faltan salidas; límites y desbordamiento; unión, texto, perfiles de imagen y compresión |
 | Imágenes | Orden natural, PDF combinado, HEIC real, JPEG incrustado con sus bytes originales, cinco formatos de salida; confirmación y cancelación de una imagen animada; lote con fallo parcial |
 | Audio | Seis formatos reales, verificados con ffprobe |
 | Vídeo | Tres perfiles MP4 desde dimensiones impares y RGB; códec, dimensiones pares y yuv420p; WebM, GIF, audio; compresión útil e inútil |
@@ -88,6 +88,14 @@ Después de instalar una versión revisada y volver a abrir Dolphin:
 
 La suite automatizada no abre Dolphin ni verifica visualmente iconos, diálogos,
 traducciones o notificaciones. Esta comprobación queda pendiente antes de publicar.
+
+## Verificación de la versión 1.4.0
+
+- `make check` y `make test-package` correctos.
+- `make test-integration` completó 46 pruebas sin fallos ni omisiones. Se usó
+  qpdf 12.4.2 y una copia temporal verificada de ImageMagick 7.1.2.33.
+- `make test-kde` verificó los menús instalados en un prefijo temporal mediante
+  la API de KIO. El menú de PDF también apareció en una ventana aislada de Dolphin.
 
 ## Resultado de la revisión de 2026-10-13
 

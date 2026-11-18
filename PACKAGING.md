@@ -57,7 +57,8 @@ Si namcap está instalado también lo ejecuta. Al terminar limpia todos
 los artefactos de esa construcción.
 
 Requiere Arch o un entorno compatible con makepkg, pacman y bsdtar, ejecutado
-como usuario sin privilegios. `poppler` y `kdialog` deben estar instalados.
+como usuario sin privilegios. Para el código actual también se necesitan
+`poppler`, `qpdf` y `kdialog`.
 La versión del paquete de prueba es la del PKGBUILD vigente; es un artefacto
 local de validación, no una versión publicable.
 

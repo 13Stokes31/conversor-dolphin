@@ -7,7 +7,7 @@ pkgdesc="Dolphin (KF6) service menu to manage PDF and convert PDF, images, SVG, 
 arch=('any')
 url="https://github.com/13Stokes31/conversor-dolphin"
 license=('MIT')
-depends=('poppler' 'kdialog')
+depends=('poppler' 'qpdf' 'kdialog')
 optdepends=('ghostscript: comprimir PDF'
             'img2pdf: convertir imágenes a PDF'
             'imagemagick: convertir imágenes y admitir HEIC/HEIF a PDF'

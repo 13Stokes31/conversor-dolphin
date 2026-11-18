@@ -26,6 +26,8 @@ archivos local se trata como cualquier otra carpeta.
   Las ejecuciones simultáneas publican resultados sin reemplazarse entre sí.
 - Las páginas divididas y las imágenes de un PDF se agrupan en una subcarpeta.
   Se admiten espacios, porcentajes, saltos de línea y nombres que empiezan por `-`.
+- **Dividir PDF:** qpdf extrae páginas, rangos o bloques directamente. Los PDF
+  resultantes conservan el cifrado del original cuando se puede abrir.
 - La conversión se realiza en temporales privados. Solo se publica el resultado
   terminado; se limpian los temporales al cancelar, fallar o recibir SIGINT/SIGTERM.
   Un cierre forzoso (SIGKILL) o un apagado puede dejar carpetas ocultas
@@ -58,7 +60,8 @@ archivos local se trata como cualquier otra carpeta.
 
 ## Dependencias
 
-**Obligatorias:** Bash, utilidades GNU habituales de Linux, `poppler` y `kdialog`.
+**Obligatorias:** Bash, utilidades GNU habituales de Linux, `poppler`, `qpdf` y
+`kdialog`. Poppler se utiliza en las demás operaciones de PDF que lo requieren.
 En Arch, Bash/coreutils forman parte del sistema base.
 
 | Función | Paquetes opcionales en Arch |
