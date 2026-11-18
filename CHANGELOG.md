@@ -5,6 +5,9 @@ Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/).
 
 ## [Sin publicar]
 
+### Añadido
+- Acción rápida opcional para convertir DOCX a PDF con WordCraft.
+
 ### Mejorado
 - Los documentos de una carpeta con nombres base distintos se convierten a PDF
   en una llamada a LibreOffice. Ante un fallo del lote, se reintenta en orden

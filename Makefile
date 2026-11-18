@@ -18,11 +18,11 @@ LICENSEDIR := $(SHAREDIR)/licenses/$(NAME)
 
 SCRIPTS := comun.sh pdf-unir.sh pdf-dividir.sh pdf-convertir.sh img-a-pdf.sh office-a-pdf.sh \
            img-convertir.sh audio-convertir.sh video-convertir.sh svg-convertir.sh \
-           ebook-a-pdf.sh
+           ebook-a-pdf.sh wordcraft-a-pdf.sh
 MENUS   := conversor-dolphin-pdf.desktop conversor-dolphin-unir.desktop \
            conversor-dolphin-imagenes.desktop conversor-dolphin-oficina.desktop \
            conversor-dolphin-audio.desktop conversor-dolphin-video.desktop \
-           conversor-dolphin-svg.desktop conversor-dolphin-ebook.desktop
+           conversor-dolphin-svg.desktop conversor-dolphin-ebook.desktop conversor-dolphin-docx.desktop
 
 .PHONY: install uninstall check test test-integration test-package test-kde
 

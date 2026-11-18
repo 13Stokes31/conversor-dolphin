@@ -16,6 +16,7 @@ optdepends=('ghostscript: comprimir PDF'
             'librsvg: convertir SVG a PNG/PDF'
             'calibre: convertir libros electrónicos (EPUB/MOBI/AZW…) a PDF'
             'libreoffice-still: convertir documentos de oficina a PDF (o libreoffice-fresh)'
+            'wordcraft-bin: conversión rápida de DOCX a PDF (AUR)'
             'ocrmypdf: OCR, añadir capa de texto buscable a un PDF (AUR)'
             'tesseract-data-spa: datos de OCR en español')
 install="$pkgname.install"

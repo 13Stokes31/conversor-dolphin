@@ -1,0 +1,14 @@
+[Desktop Entry]
+Type=Service
+X-KDE-Protocol=file
+X-KDE-Priority=TopLevel
+MimeType=application/vnd.openxmlformats-officedocument.wordprocessingml.document;
+Actions=docxFastPdf
+X-KDE-Submenu=Convert document
+X-KDE-Submenu[es]=Convertir documento
+
+[Desktop Action docxFastPdf]
+Name=to PDF (fast, WordCraft)
+Name[es]=a PDF rápido con WordCraft
+Icon=application-pdf
+Exec=/usr/share/conversor-dolphin/wordcraft-a-pdf.sh %F

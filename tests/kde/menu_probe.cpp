@@ -68,6 +68,14 @@ int main(int argc, char **argv)
         check({localPdf, localPdf}, "PDF Actions", "Acciones PDF", 1, "application-pdf");
         check({localImage, localPdf}, "Convert image", "Convertir imagen", 0);
         check({localImage, localPdf}, "PDF Actions", "Acciones PDF", 0);
+        const KFileItem localDocx(QUrl::fromLocalFile(temporary.filePath("informe.docx")),
+                                  "application/vnd.openxmlformats-officedocument.wordprocessingml.document", S_IFREG);
+        const KFileItem localDoc(QUrl::fromLocalFile(temporary.filePath("informe.doc")),
+                                 "application/msword", S_IFREG);
+        check({localDocx}, "Convert document", "Convertir documento", 2);
+        check({localDocx, localDocx}, "Convert document", "Convertir documento", 2);
+        check({localDoc}, "Convert document", "Convertir documento", 1);
+        check({localDocx, localDoc}, "Convert document", "Convertir documento", 1);
     } catch (const std::exception &error) {
         std::cerr << error.what() << '\n';
         return 1;

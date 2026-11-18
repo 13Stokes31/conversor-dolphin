@@ -45,6 +45,8 @@ se pueden recrear siguiendo README y PACKAGING para trabajar en otra versión.
   anteriores del lote.
 - Conversión que conserve animaciones y TIFF multipágina como opción explícita.
   La acción actual convierte solo el primer fotograma/página y avisa antes.
+- Evaluar DeckCraft como acción rápida de PPTX a PDF con presentaciones que
+  incluyan gráficos, diapositivas maestras y fuentes variadas.
 - Automatizar las comprobaciones existentes en CI cuando se disponga de un
   entorno con los conversores necesarios. Las herramientas ausentes deben
   contabilizarse como pruebas omitidas, nunca como conversiones verificadas.
