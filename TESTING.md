@@ -54,7 +54,7 @@ haya pruebas en marcha. Ninguna prueba toca la instalación de `/usr`.
 | Audio | Seis formatos reales, verificados con ffprobe |
 | Vídeo | Tres perfiles MP4 desde dimensiones impares y RGB; códec, dimensiones pares y yuv420p; WebM, GIF, audio; compresión útil e inútil |
 | SVG | PNG, PDF y SVGZ reales |
-| Oficina | Dos documentos con el mismo nombre base y TMPDIR con espacios, porcentaje y Unicode |
+| Oficina | Agrupación por carpeta y nombre base; PDF previos intactos; reintento ordenado ante error o salida ausente; LibreOffice real con nombres base repetidos y TMPDIR con espacios, porcentaje y Unicode |
 | Libros | EPUB mínimo convertido por Calibre a un PDF válido |
 | OCR | Imagen escaneada sintética, OCR español y comprobación del texto extraído |
 | Instalación | PREFIX `/usr`, `/usr/local` y ruta con espacios; DESTDIR; desinstalación que conserva archivos ajenos; PKGBUILD y .SRCINFO sincronizados |
@@ -81,6 +81,10 @@ Después de instalar una versión revisada y volver a abrir Dolphin:
    y la confirmación antes de convertir una imagen animada.
 5. Cancelar los diálogos de rango, bloques y unión. Comprobar que no aparecen
    resultados incompletos ni ventanas de error por una cancelación normal.
+6. [ ] Seleccionar un DOC, un DOCX y un ODT de la misma carpeta y ejecutar
+   «Convertir documento → a PDF». Comprobar el contenido y el nombre de los
+   tres resultados. Repetir con dos documentos que compartan nombre base
+   y comprobar que cada PDF contiene el documento correspondiente.
 
 La suite automatizada no abre Dolphin ni verifica visualmente iconos, diálogos,
 traducciones o notificaciones. Esta comprobación queda pendiente antes de publicar.

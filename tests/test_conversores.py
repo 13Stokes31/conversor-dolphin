@@ -539,17 +539,91 @@ kill -TERM $$
         self.assertEqual(result.returncode, 143)
         self.assertFalse(list(self.work.rglob(".conversor-dolphin.*")))
 
+    def stub_office(self):
+        log = self.work / "office.jsonl"
+        self.env["OFFICE_CALLS"] = str(log)
+        self.stub("soffice", '''#!/usr/bin/env python3
+import json, os, sys
+from pathlib import Path
+args = sys.argv[1:]
+outdir_index = args.index("--outdir") + 1
+stage = Path(args[outdir_index])
+sources = args[outdir_index + 1:]
+with open(os.environ["OFFICE_CALLS"], "a") as log:
+    log.write(json.dumps(sources) + "\\n")
+for source in map(Path, sources):
+    output = stage / source.with_suffix(".pdf").name
+    if source.name == "danado.docx":
+        print("No se puede abrir el documento.", file=sys.stderr)
+        if os.environ.get("OFFICE_FAILURE") == "partial":
+            output.write_text("salida parcial")
+            sys.exit(2)
+    else:
+        output.write_text(source.read_text())
+''')
+        return log
+
+    def test_office_batches_by_directory_and_distinct_stems(self):
+        log = self.stub_office()
+        other = self.work / "otra carpeta"
+        other.mkdir()
+        documents = [self.work / "informe.doc", self.work / "-anexo %\n.docx",
+                     self.work / ".oculto.odt", self.work / "informe.odt",
+                     other / "informe.doc", other / "resumen.docx"]
+        for i, document in enumerate(documents):
+            document.write_text(f"documento {i}")
+        (self.work / "informe.pdf").write_text("PDF previo")
+
+        self.run_script("office-a-pdf.sh", *documents)
+
+        paths = [str(document) for document in documents]
+        self.assertEqual([json.loads(line) for line in log.read_text().splitlines()],
+                         [paths[:3], paths[3:4], paths[4:]])
+        actual = [self.work / "informe-2.pdf", self.work / "-anexo %\n.pdf",
+                  self.work / ".oculto.pdf", self.work / "informe-3.pdf",
+                  other / "informe.pdf", other / "resumen.pdf"]
+        self.assertEqual([pdf.read_text() for pdf in actual], [f"documento {i}" for i in range(6)])
+        self.assertEqual((self.work / "informe.pdf").read_text(), "PDF previo")
+
+    def test_office_failed_batch_preserves_only_previous_documents(self):
+        for failure in ("missing", "partial"):
+            with self.subTest(failure=failure):
+                log = self.stub_office()
+                log.write_text("")
+                self.env["OFFICE_FAILURE"] = failure
+                folder = self.work / failure
+                folder.mkdir()
+                documents = [folder / name for name in ("primero.doc", "danado.docx", "ultimo.odt")]
+                for document in documents:
+                    document.write_text(document.name)
+
+                self.run_script("office-a-pdf.sh", *documents, success=False)
+
+                paths = [str(document) for document in documents]
+                self.assertEqual([json.loads(line) for line in log.read_text().splitlines()],
+                                 [paths, paths[:1], paths[1:2]])
+                self.assertEqual(list(folder.glob("*.pdf")), [folder / "primero.pdf"])
+                self.assertEqual((folder / "primero.pdf").read_text(), "primero.doc")
+                message = [dialog[-1] for dialog in self.dialogs() if "--error" in dialog][-1]
+                self.assertIn("danado.docx", message)
+                self.assertIn("No se puede abrir el documento.", message)
+                self.assertIn("Se conservan los 1 resultado(s)", message)
+
     @unittest.skipUnless(INTEGRATION, "Activar con make test-integration")
-    @requires("soffice", "pdfinfo")
+    @requires("soffice", "pdftotext", "pdfinfo")
     def test_office_same_stem_and_special_tmpdir(self):
         tempdir = self.work / "temporales con espacio % y ñ"
         tempdir.mkdir()
         self.env["TMPDIR"] = str(tempdir)
-        for name in ("informe.txt", "informe.rtf"):
-            (self.work / name).write_text("{\\rtf1 Documento de prueba}" if name.endswith("rtf") else "Documento de prueba")
-        self.run_script("office-a-pdf.sh", self.work / "informe.txt", self.work / "informe.rtf")
-        self.assertEqual(self.pages(self.work / "informe.pdf"), 1)
-        self.assertEqual(self.pages(self.work / "informe-2.pdf"), 1)
+        (self.work / "informe.txt").write_text("Primer informe")
+        (self.work / "anexo.rtf").write_text("{\\rtf1 Anexo de prueba}")
+        (self.work / "informe.rtf").write_text("{\\rtf1 Segundo informe}")
+        self.run_script("office-a-pdf.sh", *(self.work / name for name in ("informe.txt", "anexo.rtf", "informe.rtf")))
+        outputs = {"informe.pdf": "Primer informe", "anexo.pdf": "Anexo de prueba", "informe-2.pdf": "Segundo informe"}
+        for name, expected in outputs.items():
+            pdf = self.work / name
+            self.assertEqual(self.pages(pdf), 1)
+            self.assertIn(expected, self.command("pdftotext", str(pdf), "-").stdout)
 
     @unittest.skipUnless(INTEGRATION, "Activar con make test-integration")
     @requires("ebook-convert", "pdfinfo")

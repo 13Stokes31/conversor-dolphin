@@ -33,6 +33,9 @@ archivos local se trata como cualquier otra carpeta.
 - En un lote, los resultados ya completados se conservan si falla un archivo
   posterior. El diálogo de error indica cuántos se completaron. Una entrada
   inexistente o ilegible se detecta antes de iniciar la conversión.
+- **Documentos a PDF:** una llamada a LibreOffice convierte varios documentos
+  consecutivos de la misma carpeta con nombres base distintos. Si el lote
+  falla, se reintenta documento a documento en el orden recibido.
 - **Imágenes a PDF:** orden natural por ruta (`foto1`, `foto2`, `foto10`). JPEG
   se incrusta sin recodificar. Si `img2pdf` no entiende un formato, se utiliza
   ImageMagick para decodificarlo a PNG; por ejemplo, HEIC/HEIF. No se añade

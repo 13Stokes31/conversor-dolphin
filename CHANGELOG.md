@@ -3,6 +3,13 @@
 Todas las novedades relevantes de este proyecto se documentan aquí.
 Formato basado en [Keep a Changelog](https://keepachangelog.com/es-ES/).
 
+## [Sin publicar]
+
+### Mejorado
+- Los documentos de una carpeta con nombres base distintos se convierten a PDF
+  en una llamada a LibreOffice. Ante un fallo del lote, se reintenta en orden
+  para conservar las conversiones anteriores al documento que falla.
+
 ## [1.3.2] — 2026-10-14
 
 ### Corregido
