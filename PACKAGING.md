@@ -51,7 +51,7 @@ make test-package
 `test-package` genera un tarball del código actual en `tests/.tmp`, copia el
 PKGBUILD y sustituye **solo en esa copia** la fuente remota por el archivo local
 y su SHA256. Ejecuta makepkg sin instalar ni descargar dependencias, verifica
-los scripts (incluido `comun.sh`), menús, licencia, dependencias,
+los once scripts (incluido `comun.sh`), ocho menús, licencia, dependencias,
 propietario root y ausencia de archivos inesperados en el paquete.
 Si namcap está instalado también lo ejecuta. Al terminar limpia todos
 los artefactos de esa construcción.

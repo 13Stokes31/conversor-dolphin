@@ -12,7 +12,7 @@ locales con herramientas del sistema y diálogos de `kdialog`.
 | Audio | MP3, FLAC, WAV, OGG Vorbis, Opus y M4A AAC |
 | Vídeo | MP4 H.264, MP4 720p/1080p, WebM VP9, GIF animado, extraer MP3 y comprimir |
 | Libros electrónicos | PDF mediante Calibre |
-| Documentos de oficina | PDF mediante LibreOffice; opción rápida con WordCraft para DOCX |
+| Documentos de oficina | PDF mediante LibreOffice |
 
 Los nombres del menú están disponibles en español e inglés. Los diálogos están
 en español. Las acciones solo aparecen sobre archivos locales del tipo apropiado;
@@ -36,9 +36,6 @@ archivos local se trata como cualquier otra carpeta.
 - **Documentos a PDF:** una llamada a LibreOffice convierte varios documentos
   consecutivos de la misma carpeta con nombres base distintos. Si el lote
   falla, se reintenta documento a documento en el orden recibido.
-- **DOCX a PDF rápido:** WordCraft es una acción independiente. Avisa si detecta
-  caracteres o imágenes que no puede exportar. Los márgenes, saltos de página
-  y otros detalles de maquetación pueden diferir entre motores.
 - **Imágenes a PDF:** orden natural por ruta (`foto1`, `foto2`, `foto10`). JPEG
   se incrusta sin recodificar. Si `img2pdf` no entiende un formato, se utiliza
   ImageMagick para decodificarlo a PNG; por ejemplo, HEIC/HEIF. No se añade
@@ -73,7 +70,6 @@ En Arch, Bash/coreutils forman parte del sistema base.
 | SVG | `librsvg` |
 | Libros | `calibre` |
 | Oficina | `libreoffice-still` o `libreoffice-fresh` |
-| DOCX a PDF rápido | `wordcraft-bin` (AUR) |
 | OCR | `ocrmypdf` (AUR), `tesseract-data-spa` |
 
 Cada acción informa de la herramienta que falta. En otras distribuciones hay
@@ -169,8 +165,8 @@ Consulta [TESTING.md](TESTING.md) para cobertura y comprobaciones manuales,
 [ROADMAP.md](ROADMAP.md) para trabajo pendiente, [PACKAGING.md](PACKAGING.md) para
 publicar y [CHANGELOG.md](CHANGELOG.md) para el historial.
 
-Los conversores cargan `comun.sh`, que gestiona diálogos, validación, temporales
-y publicación. Los archivos `.desktop` definen las acciones por MIME.
+Los diez conversores cargan `comun.sh`, que gestiona diálogos, validación,
+temporales y publicación. Los ocho `.desktop` definen las acciones por MIME.
 `Makefile` centraliza la instalación y `PKGBUILD` la utiliza para AUR.
 
 MIT — [LICENSE](LICENSE).

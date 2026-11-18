@@ -150,10 +150,6 @@ for option in ("--textinputbox", "--inputbox", "--combobox", "--yesno"):
                 first = entry["Actions"].split(";")[0]
                 self.assertTrue(config["Desktop Action " + first]["Icon"].startswith("image-"))
                 self.assertEqual(config["Desktop Action imgToPdf"]["Icon"], "application-pdf")
-            if path.name == "conversor-dolphin-docx.desktop":
-                self.assertEqual(entry["MimeType"], "application/vnd.openxmlformats-officedocument.wordprocessingml.document;")
-                self.assertEqual(config["Desktop Action docxFastPdf"]["Exec"],
-                                 "/usr/share/conversor-dolphin/wordcraft-a-pdf.sh %F")
 
     @requires("makepkg")
     def test_srcinfo_matches_pkgbuild(self):
@@ -170,7 +166,7 @@ for option in ("--textinputbox", "--inputbox", "--combobox", "--yesno"):
                 self.assertEqual(result.returncode, 0, result.stderr)
                 share = stage / prefix.lstrip("/") / "share"
                 scripts = share / "conversor-dolphin"
-                self.assertEqual(len(list(scripts.glob("*.sh"))), 12)
+                self.assertEqual(len(list(scripts.glob("*.sh"))), 11)
                 for menu in (share / "kio/servicemenus").glob("*.desktop"):
                     config = configparser.ConfigParser(interpolation=None)
                     config.read(menu)
@@ -628,44 +624,6 @@ for source in map(Path, sources):
             pdf = self.work / name
             self.assertEqual(self.pages(pdf), 1)
             self.assertIn(expected, self.command("pdftotext", str(pdf), "-").stdout)
-
-    @requires("wordcraft-cli", "pdftotext")
-    def test_wordcraft_docx_to_pdf_and_existing_destination(self):
-        document = self.work / "-informe con % y ñ.DOCX"
-        with zipfile.ZipFile(document, "w") as archive:
-            archive.writestr("[Content_Types].xml", '''<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
-                <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
-                <Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/>
-                </Types>''')
-            archive.writestr("_rels/.rels", '''<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
-                <Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/>
-                </Relationships>''')
-            archive.writestr("word/document.xml", '''<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
-                <w:body><w:p><w:r><w:t>Informe WordCraft</w:t></w:r></w:p></w:body></w:document>''')
-        previous = document.with_suffix(".pdf")
-        previous.write_text("PDF previo")
-        self.run_script("wordcraft-a-pdf.sh", document.name)
-        self.assertEqual(previous.read_text(), "PDF previo")
-        output = self.work / f"{document.stem}-2.pdf"
-        self.assertIn("Informe WordCraft", self.command("pdftotext", str(output), "-").stdout)
-
-    def test_wordcraft_strict_failure_preserves_completed_results(self):
-        self.stub("wordcraft-cli", '''#!/usr/bin/env bash
-[[ "$1" == convert && "$4" == --strict ]] || exit 2
-printf 'salida' > "$3"
-if [[ "$2" == */danado.docx ]]; then
-    printf 'La imagen no se puede incluir.\\n' >&2
-    exit 3
-fi
-''')
-        documents = [self.work / name for name in ("primero.docx", "danado.docx", "ultimo.docx")]
-        for document in documents:
-            document.touch()
-        self.run_script("wordcraft-a-pdf.sh", *documents, success=False)
-        self.assertEqual(list(self.work.glob("*.pdf")), [self.work / "primero.pdf"])
-        message = [dialog[-1] for dialog in self.dialogs() if "--error" in dialog][-1]
-        for text in ("danado.docx", "La imagen no se puede incluir.", "LibreOffice", "Se conservan los 1 resultado(s)"):
-            self.assertIn(text, message)
 
     @unittest.skipUnless(INTEGRATION, "Activar con make test-integration")
     @requires("ebook-convert", "pdfinfo")

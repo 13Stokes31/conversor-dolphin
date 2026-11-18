@@ -10,7 +10,7 @@ make test-package
 make test-kde          # opcional, después de instalar
 ```
 
-- `check` valida individualmente la sintaxis de los archivos Bash y ejecuta
+- `check` valida individualmente la sintaxis de los once archivos Bash y ejecuta
   ShellCheck con las funciones compartidas cargadas.
 - `test` utiliza `unittest` de la biblioteca estándar de Python 3. No requiere
   frameworks, conexión a Internet, instalación del paquete ni sesión gráfica.
@@ -27,7 +27,6 @@ make test-kde          # opcional, después de instalar
   Comprueba seis acciones de imagen con icono `image-png`, siete acciones sobre
   un PDF con icono PDF, una acción para unir varios PDF, exclusión de selecciones
   mezcladas y ausencia del menú de imágenes en URLs sftp/smb simuladas.
-  Para oficina comprueba que la opción rápida aparece al seleccionar solo DOCX.
   Usa Breeze y Qt offscreen; no abre ventanas, lanza conversiones ni contacta
   con servidores. La configuración del usuario debe tener habilitadas estas
   acciones de servicio para que las comprobaciones de recuento pasen.
@@ -56,11 +55,10 @@ haya pruebas en marcha. Ninguna prueba toca la instalación de `/usr`.
 | Vídeo | Tres perfiles MP4 desde dimensiones impares y RGB; códec, dimensiones pares y yuv420p; WebM, GIF, audio; compresión útil e inútil |
 | SVG | PNG, PDF y SVGZ reales |
 | Oficina | Agrupación por carpeta y nombre base; PDF previos intactos; reintento ordenado ante error o salida ausente; LibreOffice real con nombres base repetidos y TMPDIR con espacios, porcentaje y Unicode |
-| WordCraft | DOCX real con nombre especial; colisiones; limpieza y conservación de los PDF anteriores a un fallo del modo estricto |
 | Libros | EPUB mínimo convertido por Calibre a un PDF válido |
 | OCR | Imagen escaneada sintética, OCR español y comprobación del texto extraído |
 | Instalación | PREFIX `/usr`, `/usr/local` y ruta con espacios; DESTDIR; desinstalación que conserva archivos ajenos; PKGBUILD y .SRCINFO sincronizados |
-| Paquete | Tarball local y SHA256; scripts, menús, licencia, rutas Exec, dependencias, propietario root y ausencia de archivos inesperados |
+| Paquete | Tarball local y SHA256; once scripts, ocho menús, licencia, rutas Exec, dependencias, propietario root y ausencia de archivos inesperados |
 
 Las pruebas no constituyen una validación exhaustiva de todos los formatos de
 entrada, codecs, idiomas, DRM, fuentes o sistemas de archivos. Las colisiones
@@ -87,25 +85,9 @@ Después de instalar una versión revisada y volver a abrir Dolphin:
    «Convertir documento → a PDF». Comprobar el contenido y el nombre de los
    tres resultados. Repetir con dos documentos que compartan nombre base
    y comprobar que cada PDF contiene el documento correspondiente.
-7. [ ] Seleccionar uno o varios DOCX y comprobar que aparecen «a PDF» y
-   «a PDF rápido con WordCraft». Ejecutar la opción rápida y abrir los PDF
-   generados. En un DOC, un ODT o una selección mixta debe aparecer «a PDF».
 
 La suite automatizada no abre Dolphin ni verifica visualmente iconos, diálogos,
 traducciones o notificaciones. Esta comprobación queda pendiente antes de publicar.
-
-## Comparación de motores de Crafting Apps — 2026-11-18
-
-Se hicieron tres ejecuciones por motor y formato con archivos sintéticos. Las
-pruebas de LibreOffice arrancaron con un perfil nuevo en cada ejecución.
-
-| Operación | Medianas y resultado |
-| --- | --- |
-| DOCX a PDF | WordCraft 0.18.1 tardó 45 ms frente a 1,57 s de LibreOffice 26.8.3.1. En un informe de dos páginas conservó el texto, la tabla y la imagen. Hubo pequeños desplazamientos y desapareció la línea separadora de la nota al pie. |
-| PPTX a PDF | DeckCraft 0.18.1 tardó 0,12 s frente a 1,28 s de LibreOffice. Las dos diapositivas de prueba conservaron texto, tamaño y disposición visual. |
-| XLSX a PDF | GridCraft 0.19.1 tardó 0,008 s y solo exportó la hoja activa por defecto. Exportar las dos hojas por separado y unirlas con `pdfunite` tardó 0,031 s. Ambas quedaron en formato Letter. LibreOffice exportó las dos a A4 en 1,37 s. |
-| Dividir PDF | PdfCraft 0.21.1 tardó 0,060 s frente a 0,048 s de `qpdf`. Ambos generaron 12 bloques de 10 páginas y conservaron su orden. |
-| SVG a PNG y PDF | VectorCraft 0.24.1 tardó 0,078 s y 0,065 s. `rsvg-convert` tardó 0,048 s y 0,044 s. Los PNG midieron 320 × 200 píxeles. Los PDF midieron 320 × 200 pt con VectorCraft y 240 × 150 pt con librsvg. |
 
 ## Resultado de la revisión de 2026-10-13
 
